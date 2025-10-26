@@ -10,12 +10,13 @@ namespace backend.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _configuration;
-        private readonly SymmetricSecurityKey _key;
+        private readonly IConfiguration _configuration; // getting the appSetting.json information
+        private readonly SymmetricSecurityKey _key;      // to store the secret key
         public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            //here we get the secret key from appSetting.json and hashing it
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])); 
         }
         public string CreateToken(ApplicationUser user, List<string> roles)
         {
@@ -42,8 +43,8 @@ namespace backend.Services
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(7), // صلاحية التوكن (مثلاً: 7 أيام)
-                Issuer = _configuration["JWT:ValidIssuer"],
-                Audience = _configuration["JWT:ValidAudience"],
+                Issuer = _configuration["JWT:ValidIssuer"], //server url
+                Audience = _configuration["JWT:ValidAudience"], // frontend framework url
                 SigningCredentials = creds
             };
 
