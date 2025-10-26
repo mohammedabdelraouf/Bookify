@@ -1,1 +1,4 @@
+# Standard .NET Core ignores
+[Bb]in/
+[Oo]bj/
 .vs/
