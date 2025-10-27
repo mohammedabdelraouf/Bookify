@@ -1,34 +1,38 @@
 ﻿using backend.Data;
+using backend.Interfaces;
 using backend.Models;
+using backend.OptionsPattern.Settings;
+using backend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using backend.Interfaces;
-using backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-
-// add DbContext service to the application
-builder.Services.AddDbContext<BookifyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // telling the app to use the ApplicationUser and IdentityRole for identity management
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<BookifyDbContext>().AddDefaultTokenProviders(); // here to store all the user information in the database BookifyDbContext
 
+// add DbContext service to the application
+builder.Services.AddDbContext<BookifyDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// bind the JWT settings from appsettings.json
+builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection(JWTSettings.SectionName));
+var jwtSettings = new JWTSettings();
+builder.Configuration.GetSection(JWTSettings.SectionName).Bind(jwtSettings);
 //--- الجزء ده لسا هذاكره --------------------------------------------------
 // --- 3. إعداد الـ Authentication والـ JWT (لـ React) ---
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //scheme for 401 error
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+//الجزء ده علشان اعرفه مكان ال key و ازاي هيعمل validation للتوكن
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
@@ -37,9 +41,9 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        ValidAudience = jwtSettings.ValidAudience,
+        ValidIssuer = jwtSettings.ValidIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
     };
 });
 //---------------------------------------------------------------------------
@@ -77,7 +81,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // --- 6. إضافة الـ Authentication (مهم جداً!) ---
-app.UseAuthentication(); // <-- لازم ييجي قبل الـ Authorization
+app.UseAuthentication(); // <-- لازم ييجي قبل الـ Authorization // لان اصلا الطبيعي انا بشوف انت مسموح تسنخدم السيستم ولا لا
 
 // this middleware to use authorization verification of user roles
 app.UseAuthorization();

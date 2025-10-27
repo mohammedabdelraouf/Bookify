@@ -1,5 +1,7 @@
 ﻿using backend.Interfaces;
 using backend.Models;
+using backend.OptionsPattern.Settings;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,13 +12,13 @@ namespace backend.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _configuration; // getting the appSetting.json information
+        private readonly JWTSettings _jwtSettings;
         private readonly SymmetricSecurityKey _key;      // to store the secret key
-        public TokenService(IConfiguration configuration)
+        public TokenService(IOptions<JWTSettings> jWTSettings)
         {
-            _configuration = configuration;
+            _jwtSettings = jWTSettings.Value;
             //here we get the secret key from appSetting.json and hashing it
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])); 
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)); 
         }
         public string CreateToken(ApplicationUser user, List<string> roles)
         {
@@ -42,9 +44,9 @@ namespace backend.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7), // صلاحية التوكن (مثلاً: 7 أيام)
-                Issuer = _configuration["JWT:ValidIssuer"], //server url
-                Audience = _configuration["JWT:ValidAudience"], // frontend framework url
+               
+                Issuer = _jwtSettings.ValidIssuer, //server url
+                Audience = _jwtSettings.ValidAudience, // frontend framework url
                 SigningCredentials = creds
             };
 
