@@ -2,6 +2,7 @@
 using backend.Interfaces;
 using backend.Models;
 using backend.OptionsPattern.Settings;
+using backend.Repositories;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -51,7 +52,8 @@ builder.Services.AddControllers();// this line is for directing the request to c
 builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpenApi
 builder.Services.AddSwaggerGen(); // <-- بيولد ملف Swagger
 
-builder.Services.AddScoped<ITokenService, TokenService>(); // <-- تسجيل خدمة الـ TokenService
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
 var app = builder.Build();
 
 // adding the rules of the user
