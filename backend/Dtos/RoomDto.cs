@@ -1,0 +1,15 @@
+﻿namespace backend.Dtos
+{
+    public class RoomDto
+    {
+        public int roomId { get; set; }
+        public string roomNumber { get; set; } = string.Empty;
+        public int floor { get; set; }
+
+        // flatted from RoomType --> this will make it easier for front-end to consume the data
+        public string roomTypeName { get; set; } = string.Empty;
+        public string? roomTypeDescription { get; set; }
+        public int roomTypeCapacity { get; set; }
+        public decimal roomTypePricePerNight { get; set; }
+    }
+}

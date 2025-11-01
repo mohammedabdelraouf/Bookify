@@ -1,12 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using backend.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
-    public class RoomsController : Controller
+    [ApiController] // add features like understanding request body, model validation, etc [formbody]
+    [Route("api/[controller]")]
+
+    public class RoomsController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IRoomRepository _roomRepository;
+        public RoomsController(IRoomRepository roomRepository)
         {
-            return View();
+            _roomRepository = roomRepository;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllRooms()
+        {
+            var rooms = await _roomRepository.GetAllRoomsAsync();
+            return Ok(rooms);
+        }
+        [HttpGet("{roomId}")]
+        public async Task<IActionResult> GetRoomByID(int roomId)
+        {
+            var room = await _roomRepository.GetRoomDtoByIdAsync(roomId);
+            if (room == null)
+                return NotFound();
+            return Ok(room);
+        }
+      
+
     }
 }

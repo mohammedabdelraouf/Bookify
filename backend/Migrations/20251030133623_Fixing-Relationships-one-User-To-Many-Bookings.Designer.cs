@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(BookifyDbContext))]
-    partial class BookifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251030133623_Fixing-Relationships-one-User-To-Many-Bookings")]
+    partial class FixingRelationshipsoneUserToManyBookings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -317,9 +320,6 @@ namespace backend.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
@@ -335,7 +335,7 @@ namespace backend.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.HasIndex("BookingId")
+                    b.HasIndex("BookId")
                         .IsUnique();
 
                     b.HasIndex("UserId");
@@ -484,9 +484,9 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Review", b =>
                 {
-                    b.HasOne("backend.Models.Booking", "Booking")
+                    b.HasOne("backend.Models.Booking", "Book")
                         .WithOne("Review")
-                        .HasForeignKey("backend.Models.Review", "BookingId")
+                        .HasForeignKey("backend.Models.Review", "BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -496,7 +496,7 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Booking");
+                    b.Navigation("Book");
 
                     b.Navigation("User");
                 });

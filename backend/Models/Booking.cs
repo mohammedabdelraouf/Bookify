@@ -20,24 +20,22 @@ namespace backend.Models
         public decimal TotalAmount { get; set; }
         [Required]
         public BookingStatus bookingStatus { get; set; } = BookingStatus.Pending;
+
+        // --------------- Relationships ----------------
         [Required]
-        public string UserId { get; set; } // <-- المفتاح الأجنبي لـ IdentityUser
+        public string UserId { get; set; } 
 
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; } // <-- Navigation Property
+        public ApplicationUser User { get; set; } // many bookings by one user
 
-        // --- Foreign Key & Navigation Property for Room ---
         [Required]
-        public int RoomId { get; set; } // <-- المفتاح الأجنبي لـ Room
+        public int RoomId { get; set; }
 
         [ForeignKey("RoomId")]
-        public Room Room { get; set; } // <-- Navigation Property
+        public Room Room { get; set; } // one room can have many bookings ( the history of room booking )
 
-        // --- Navigation Property for Payment ---
-        // الحجز الواحد له عملية دفع واحدة
-        public Payment Payment { get; set; }
+        public Payment Payment { get; set; } //one booking to one payment
 
-        // relationship with the review one to one
-        public Review Review { get; set; }
+        public Review Review { get; set; } // one booking to one review
     }
 }

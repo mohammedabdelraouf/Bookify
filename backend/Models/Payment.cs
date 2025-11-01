@@ -20,13 +20,11 @@ namespace backend.Models
         // هذا الحقل لتخزين رقم العملية من Stripe
         public string? TransactionId { get; set; } // اختياري (nullable)
 
-        // --- Foreign Key & Navigation Property for Booking ---
-        // هذه العلاقة هي One-to-One
-
+        //--------------- Relationships ----------------
         [Required]
-        public int BookingId { get; set; } // <-- المفتاح الأجنبي لـ Booking
+        public int BookingId { get; set; } 
 
         [ForeignKey("BookingId")]
-        public Booking Booking { get; set; } // <-- Navigation Property
+        public Booking Booking { get; set; } // one Booking to one payment
     }
 }

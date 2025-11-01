@@ -17,7 +17,7 @@ namespace backend.Models
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal PricePerNight { get; set; }
-        public ICollection<Room> Rooms { get; set; }
+        public ICollection<Room> Rooms { get; set; } // many rooms can have same room type
 
     }
 }
