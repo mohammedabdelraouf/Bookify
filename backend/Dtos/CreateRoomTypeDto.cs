@@ -1,20 +1,18 @@
-﻿namespace backend.Models
+﻿namespace backend.Dtos
 {
-    public class RoomType
+    public class CreateRoomTypeDto
     {
-        [Key]
-        public int RoomTypeId { get; set; }
         [Required]
         [MaxLength(100)]
-        public string Name { get; set; }=string.Empty;
+        public string RoomTypeName { get; set; }
         [MaxLength(500)]
         public string? Description { get; set; }
         [Required]
+        [Range(1,5)] 
         public int Capacity { get; set; }
         [Required]
         [Column(TypeName = "decimal(18,2)")]
+        [Range(10.0, 10000.0)] 
         public decimal PricePerNight { get; set; }
-        public ICollection<Room> Rooms { get; set; } // many rooms can have same room type
-
     }
 }

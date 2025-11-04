@@ -1,7 +1,4 @@
-﻿using backend.Dtos;
-using backend.Models;
-
-namespace backend.Interfaces
+﻿namespace backend.Interfaces
 {
     public interface IRoomRepository
     {
@@ -12,8 +9,8 @@ namespace backend.Interfaces
         // Admin Methods
         Task<Room> GetRoomEntityByIdAsync(int roomId);
         Task AddRoomAsync(Room room); // parameter is RoomDto to avoid overposting and because front-end only sends these properties
-        Task UpdateRoomAsync(Room room);
-        Task DeleteRoomAsync(int roomId);
+        Task UpdateRoomAsync(int id,UpdateRoomDto UpdateRoom);
+        Task<bool> DeleteRoomAsync(int roomId);
         
     }
 }

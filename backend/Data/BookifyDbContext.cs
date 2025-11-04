@@ -1,8 +1,4 @@
-﻿using backend.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace backend.Data
+﻿namespace backend.Data
 {
     public class BookifyDbContext: IdentityDbContext<ApplicationUser>
     {

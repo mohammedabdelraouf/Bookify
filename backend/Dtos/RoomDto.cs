@@ -5,6 +5,7 @@
         public int roomId { get; set; }
         public string roomNumber { get; set; } = string.Empty;
         public int floor { get; set; }
+        public string Status { get; set; }
 
         // flatted from RoomType --> this will make it easier for front-end to consume the data
         public string roomTypeName { get; set; } = string.Empty;

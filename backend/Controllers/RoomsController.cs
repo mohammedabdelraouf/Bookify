@@ -1,7 +1,4 @@
-﻿using backend.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace backend.Controllers
+﻿namespace backend.Controllers
 {
     [ApiController] // add features like understanding request body, model validation, etc [formbody]
     [Route("api/[controller]")]

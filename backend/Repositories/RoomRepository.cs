@@ -1,10 +1,4 @@
-﻿using backend.Data;
-using backend.Dtos;
-using backend.Interfaces;
-using backend.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace backend.Repositories
+﻿namespace backend.Repositories
 {
     public class RoomRepository : IRoomRepository
     {
@@ -21,6 +15,7 @@ namespace backend.Repositories
                      roomId = r.RoomId,
                      roomNumber = r.RoomNumber,
                      floor = r.Floor,
+                     Status = r.status.ToString(),
                      roomTypeName = r.RoomType.Name,
                      roomTypeDescription = r.RoomType.Description,
                      roomTypeCapacity = r.RoomType.Capacity,
@@ -35,6 +30,7 @@ namespace backend.Repositories
                     roomId = r.RoomId,
                     roomNumber = r.RoomNumber,
                     floor = r.Floor,
+                    Status = r.status.ToString(),
                     roomTypeName = r.RoomType.Name,
                     roomTypeDescription = r.RoomType.Description,
                     roomTypeCapacity = r.RoomType.Capacity,
@@ -53,19 +49,29 @@ namespace backend.Repositories
             await _context.Rooms.AddAsync(room);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateRoomAsync(Room room)
+        public async Task UpdateRoomAsync(int id,UpdateRoomDto UpdateroomDto)
         {
-            _context.Entry(room).State = EntityState.Modified; // so the DbContext follow the new updates and add them
-            await _context.SaveChangesAsync();
+            var UpdatedRoom = await _context.Rooms.FindAsync(id);
+            if (UpdatedRoom != null) {
+                UpdatedRoom.RoomNumber = UpdateroomDto.RoomNumber;
+                UpdatedRoom.Floor = UpdateroomDto.Floor;
+                UpdatedRoom.status = UpdateroomDto.status;
+                UpdatedRoom.RoomTypeId = UpdateroomDto.RoomTypeId;
+                _context.Entry(UpdatedRoom).State = EntityState.Modified; // so the DbContext follow the new updates and add them
+                await _context.SaveChangesAsync();
+            }
+
         }
 
-        public async Task DeleteRoomAsync(int roomId)
+        public async Task<bool> DeleteRoomAsync(int roomId)
         {
             var RoomExist =await GetRoomEntityByIdAsync(roomId);
             if (RoomExist is not null) {
                 _context.Rooms.Remove(RoomExist);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
     }
 }

@@ -1,14 +1,4 @@
-﻿using backend.Data;
-using backend.Interfaces;
-using backend.Models;
-using backend.OptionsPattern.Settings;
-using backend.Repositories;
-using backend.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -50,10 +40,40 @@ builder.Services.AddAuthentication(options =>
 //---------------------------------------------------------------------------
 builder.Services.AddControllers();// this line is for directing the request to controllers
 builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpenApi
-builder.Services.AddSwaggerGen(); // <-- بيولد ملف Swagger
+builder.Services.AddSwaggerGen(options =>
+{
+// 1. تعريف نظام الأمان (Security Definition)
+// هنا بنقول لـ Swagger: "إحنا عندنا نظام أمان اسمه 'Bearer'"
+options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+{
+    Name = "Authorization", // اسم الـ Header اللي هنبعت فيه التوكن
+    Description = "Please enter token (JWT) with Bearer prefix: Bearer {token}",
+    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+    Scheme = "Bearer"
+});
+    // 2. تطبيق نظام الأمان ده
+    // هنا بنقول لـ Swagger: "اعرض أيقونة القفل 🔒 على كل الـ Endpoints
+    // وخليهم يستخدموا نظام 'Bearer' اللي عرفناه فوق"
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
+builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 var app = builder.Build();
 
 // adding the rules of the user
