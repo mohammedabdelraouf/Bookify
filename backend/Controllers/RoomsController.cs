@@ -5,7 +5,6 @@ namespace backend.Controllers
 {
     [ApiController] // add features like understanding request body, model validation, etc [formbody]
     [Route("api/[controller]")]
-
     public class RoomsController : ControllerBase
     {
         private readonly IRoomRepository _roomRepository;

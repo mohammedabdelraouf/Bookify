@@ -21,9 +21,9 @@ namespace backend.Models
         public ApplicationUser User { get; set; } // one user to many reviews
 
         // relationship with the book one to one
-        [Required]
-        public int BookingId { get; set; }
-        [ForeignKey("BookId")]
-        public Booking Booking { get; set; } // one booking to one review
+        //[Required]
+        //public int BookingId { get; set; }
+        //[ForeignKey("BookId")]
+        //public Booking Booking { get; set; } // one booking to one review
     }
 }

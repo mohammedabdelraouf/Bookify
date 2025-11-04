@@ -36,13 +36,13 @@ namespace backend.Data
             builder.Entity<Booking>()
                 .HasOne(b => b.Payment)
                 .WithOne(p => p.Booking)
-                .HasForeignKey<Payment>(p => p.BookingId); 
+                .HasForeignKey<Payment>(p => p.BookingId);
 
             // booking - review one to one
-            builder.Entity<Booking>()
-                .HasOne(b=>b.Review).WithOne(r=>r.Booking)
-                .HasForeignKey<Review>(r=>r.BookingId)
-                .OnDelete(DeleteBehavior.Restrict); //DeleteBehavior.Restrict: يمنع حذف حجز (Booking) إذا كان مرتبطاً بريفيو (Review). هذا يحافظ على سجلاتك.
+            //builder.Entity<Booking>()
+            //    .HasOne(b=>b.Review).WithOne(r=>r.Booking)
+            //    .HasForeignKey<Review>(r=>r.BookingId)
+            //    .OnDelete(DeleteBehavior.Restrict); //DeleteBehavior.Restrict: يمنع حذف حجز (Booking) إذا كان مرتبطاً بريفيو (Review). هذا يحافظ على سجلاتك.
 
             // user - review one to many
             builder.Entity<ApplicationUser>()

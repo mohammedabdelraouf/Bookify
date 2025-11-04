@@ -53,7 +53,8 @@ builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpe
 builder.Services.AddSwaggerGen(); // <-- بيولد ملف Swagger
 
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 var app = builder.Build();
 
 // adding the rules of the user

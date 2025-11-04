@@ -11,11 +11,11 @@ namespace backend.Models
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
-        [Required]
+        //[Required]
         public DateTime PaymentDate { get; set; } 
-        [Required]
+        //[Required]
         public PaymentMethod Method { get; set; }
-        [Required]
+        //[Required]
         public PaymentStatus Status { get; set; }
         // هذا الحقل لتخزين رقم العملية من Stripe
         public string? TransactionId { get; set; } // اختياري (nullable)

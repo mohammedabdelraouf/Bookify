@@ -16,7 +16,7 @@ namespace backend.Models
         public string LastName { get; set; }
         
         //Relationships
-        public ICollection<Booking> Bookings { get; set; } // many bookings by one user
+        //public ICollection<Booking> Bookings { get; set; } // many bookings by one user
         public ICollection<Review> Reviews { get; set; }  // may reviews by one user
     }
 }
