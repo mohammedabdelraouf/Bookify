@@ -17,7 +17,7 @@
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
-                new Claim("uid", user.Id) // طريقة شائعة لإضافة الـ User ID
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
             // إضافة الأدوار (Roles) إلى الـ Claims

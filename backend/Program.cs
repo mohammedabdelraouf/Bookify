@@ -74,6 +74,7 @@ options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecu
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 var app = builder.Build();
 
 // adding the rules of the user
