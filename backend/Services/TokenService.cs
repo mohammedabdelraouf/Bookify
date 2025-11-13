@@ -1,4 +1,4 @@
-﻿namespace backend.Services
+namespace backend.Services
 {
     public class TokenService : ITokenService
     {
@@ -37,6 +37,7 @@
                
                 Issuer = _jwtSettings.ValidIssuer, //server url
                 Audience = _jwtSettings.ValidAudience, // frontend framework url
+                Expires = DateTime.UtcNow.AddHours(_jwtSettings.ExpiryInHours),
                 SigningCredentials = creds
             };
 
