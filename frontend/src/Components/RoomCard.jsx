@@ -1,9 +1,10 @@
 import React from 'react'
+import assets from '../assets/assets'
 
 const RoomCard = (/*need to make it daynamic*/) => {
   return (
-    <div className='flex flex-col md:flex-row gap-5 text-white bg-slate-400 rounded-sm shadow-md'>
-      <img src="" alt="" />
+    <div className='flex flex-col gap-24 md:flex-row  text-white bg-slate-400 rounded-lg shadow-md hover:bg-slate-800 transition-colors overflow-hidden'>
+      <img src={assets.room1} alt="" className='w-100  md:w-44' />
       <div className='flex flex-col justify-between p-5'>
         <div>
           <h2 className='text-2xl font-bold mb-2'>Room1</h2>
@@ -12,10 +13,14 @@ const RoomCard = (/*need to make it daynamic*/) => {
         </div>
         <div className='flex justify-between items-center'>
           <span className='font-bold text-lg'>$100 / night</span>
-          <button className='bg-green-400 p-2 rounded text-white font-bold hover:bg-green-500 transition-colors'>
+          
+        </div>
+      </div>
+      <div className='flex items-center p-5'>
+
+      <button className='bg-green-400 p-2  w-full rounded text-white font-bold hover:bg-green-500 transition-colors'>
             Book Now
           </button>
-        </div>
       </div>
       
     </div>

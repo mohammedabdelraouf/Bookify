@@ -1,11 +1,14 @@
 import React from 'react'
-
-const AppContext = () => {
+import App from '../App'
+export const AppContext = React.createContext();
+const AppContextProvider = () => {
   return (
-    <div>
+    <AppContext.Provider value={{} }>
+      <App /> 
+    </AppContext.Provider>
       
-    </div>
+    
   )
 }
 
-export default AppContext
+export default AppContextProvider
