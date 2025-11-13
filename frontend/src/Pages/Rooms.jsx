@@ -1,11 +1,16 @@
 import React from 'react'
 import { useState, useContext, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { AppContext } from '../Context/AppContext'
 import RoomCard from '../Components/RoomCard';
+import assets from '../assets/assets';
 
 const Rooms = () => {
   const{rooms} = {
-    rooms: [1,2,3,4,5]
+    rooms: [1,2,3,4]
   }
+  const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
+
 
   const [filter, setFilter] = useState({
     price: [0, 1000],
@@ -62,8 +67,11 @@ const Rooms = () => {
 
       <div id='rooms-container' className="flex-1 ">
         <div className="flex flex-col gap-5 p-10 ">
+          
           {rooms.map((item, index) => (
-            <RoomCard key={index}/>
+            <Link key={index} to="/rooms/:roomID">
+                <RoomCard  roomimg={images[index]} roomID={rooms[index]}/>
+            </Link>
           ))}
         </div>
       </div>

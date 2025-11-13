@@ -5,6 +5,7 @@
 @tailwind utilities;
 /* stylelint-enable at-rule-no-unknown */
 
+
 a.active hr{
     display: block;
 }

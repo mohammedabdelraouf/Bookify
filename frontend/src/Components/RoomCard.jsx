@@ -1,10 +1,13 @@
 import React from 'react'
 import assets from '../assets/assets'
+import { useContext } from 'react'
+import { AppContext } from '../Context/AppContext'
 
-const RoomCard = (/*need to make it daynamic*/) => {
+const RoomCard = ({roomimg, roomID}) => {
+  const navigate = useContext(AppContext);
   return (
-    <div className='flex flex-col gap-24 md:flex-row  text-white bg-slate-400 rounded-lg shadow-md hover:bg-slate-800 transition-colors overflow-hidden'>
-      <img src={assets.room1} alt="" className='w-100  md:w-44' />
+    <div   className='flex flex-col gap-24 md:flex-row  text-white bg-slate-400 rounded-lg shadow-md hover:bg-slate-800 transition-colors overflow-hidden'>
+      <img src={roomimg} alt="" className='w-100  md:w-44' />
       <div className='flex flex-col justify-between p-5'>
         <div>
           <h2 className='text-2xl font-bold mb-2'>Room1</h2>
@@ -20,7 +23,7 @@ const RoomCard = (/*need to make it daynamic*/) => {
 
       <button className='bg-green-400 p-2  w-full rounded text-white font-bold hover:bg-green-500 transition-colors'>
             Book Now
-          </button>
+      </button>
       </div>
       
     </div>
