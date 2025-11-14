@@ -80,25 +80,16 @@ const AppContextProvider = ({ children }) => { // Accept children prop
         const fetchAllData = async () => {
             setIsLoading(true);
             setError(null);
-            
-            // Note: I'm using the corrected endpoints based on your API structure
-            const roomPromise = fetchData('/Room/GetAvailableRooms', setRooms); 
-            
-            // Only fetch users and bookings if the user is logged in
-            if (loggedIn) {
-                const userPromise = fetchData('/Users', setUsers); 
-                const bookingPromise = fetchData('/Bookings', setBookings);
-                await Promise.all([roomPromise, userPromise, bookingPromise]);
-            } else {
-                // Wait for rooms to load, but don't fetch users/bookings
-                await roomPromise; 
-            }
-            
+
+            // Fetch available rooms on app startup
+            const roomPromise = fetchData('/rooms', setRooms);
+            await roomPromise;
+
             setIsLoading(false);
         };
 
         fetchAllData();
-    }, [loggedIn, navigate]); // Rerun if login status changes
+    }, []); // Run once on mount
 
     // 5. Value to be provided to consumers
     const contextValue = {
