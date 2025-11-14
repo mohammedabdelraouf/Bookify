@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // 1. Define the Context
@@ -58,7 +58,8 @@ const AppContextProvider = ({ children }) => { // Accept children prop
                     type: room.roomTypeName,
                     description: room.roomTypeDescription,
                     capacity: room.roomTypeCapacity,
-                    price: room.roomTypePricePerNight
+                    price: room.roomTypePricePerNight,
+                    images: room.images || []
                 }));
                 // Filter for available rooms (status can be 0 for Available enum or 'Available' string)
                 setDataState(cleanedRooms.filter(room => room.status === 0 || room.status === 'Available'));
@@ -92,8 +93,8 @@ const AppContextProvider = ({ children }) => { // Accept children prop
         fetchAllData();
     }, []); // Run once on mount
 
-    // 5. Value to be provided to consumers
-    const contextValue = {
+    // 5. Value to be provided to consumers (memoized to prevent unnecessary re-renders)
+    const contextValue = useMemo(() => ({
         // State
         rooms,
         users,
@@ -101,18 +102,18 @@ const AppContextProvider = ({ children }) => { // Accept children prop
         isLoading,
         error,
         loggedIn,
-        
+
         // Functions
         setLoggedIn,
         navigate,
-        fetchData: fetchData, // Expose fetchData if components need to refresh data manually
-    };
-    
+        fetchData, // Expose fetchData if components need to refresh data manually
+    }), [rooms, users, bookings, isLoading, error, loggedIn, setLoggedIn, navigate, fetchData]);
+
     // 6. Provide the context
     return (
         <AppContext.Provider value={contextValue}>
             {/* Render children passed to the provider, which includes App */}
-            {children} 
+            {children}
         </AppContext.Provider>
     );
 }
