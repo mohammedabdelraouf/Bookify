@@ -2,12 +2,12 @@ import React from 'react'
 import assets from '../assets/assets'
 import { useContext } from 'react'
 import { AppContext } from '../Context/AppContext'
+import { useNavigation } from 'react-router-dom'
 
-const RoomCard = ({roomimg, roomID}) => {
-  const navigate = useContext(AppContext);
+const RoomCard = ({roomImg, roomData}) => {
   return (
     <div   className='flex flex-col gap-24 md:flex-row  text-white bg-slate-400 rounded-lg shadow-md hover:bg-slate-800 transition-colors overflow-hidden'>
-      <img src={roomimg} alt="" className='w-100  md:w-44' />
+      <img src={roomImg} alt="" className='w-100  md:w-44' />
       <div className='flex flex-col justify-between p-5'>
         <div>
           <h2 className='text-2xl font-bold mb-2'>Room1</h2>

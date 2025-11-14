@@ -5,15 +5,17 @@ import "react-image-gallery/styles/css/image-gallery.css";
 
 const Home = () => {
   return (
-    <div className='my-10'>
+    <main className='my-10'>
+      <section>
      <ReactImageGallery 
         items={[
           {original: assets.room1, },
           {original: assets.room2,},
           {original: assets.room3, },
           {original: assets.room4, }]}
-     /> 
-    </div>
+          /> 
+      </section>
+    </main>
   )
 }
 

@@ -5,23 +5,36 @@ import { AppContext } from '../Context/AppContext'
 import RoomCard from '../Components/RoomCard';
 import assets from '../assets/assets';
 
-const Rooms = () => {
-  const{rooms} = {
-    rooms: [1,2,3,4]
-  }
-  const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
-
-
+const  Rooms = () => {
+  const RoomsData = useContext(AppContext);
   const [filter, setFilter] = useState({
     price: [0, 1000],
     type: 'all',
     capacity: 1
   });
+ 
+ const[filteredRooms, setFilteredRooms] = useState([]);
+
+  // useEffect(() => {
+  //   let rooms = RoomsData;
+  //     // Apply price filter
+  //     rooms = rooms.filter(room => room.price >= filter.price[0] && room.price <= filter.price[1]);
+  //   // Apply type filter
+  //     rooms = rooms.filter(room => room.type === filter.type);
+  //   // Apply capacity filter
+  //     rooms = rooms.filter(room => room.capacity >= filter.capacity);
+  //     setFilteredRooms(rooms);}, [filter, RoomsData]);
+
+
+  const{rooms} = {
+    rooms: [1,2,3,4]
+  }
+  const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
 
   const [sortBy, setSortBy] = useState('price-asc');
 
   return (
-    <div className='flex flex-col md:flex-row gap-8'>
+    <main className='flex flex-col md:flex-row gap-8'>
       <aside className='w-full  md:w-1/4 p-4 border-r border-gray-600'>
         <div className='space-y-4'>
           <div>
@@ -65,17 +78,17 @@ const Rooms = () => {
         </div>
       </aside>
 
-      <div id='rooms-container' className="flex-1 ">
+      <section id='rooms-container' className="flex-1 ">
         <div className="flex flex-col gap-5 p-10 ">
-          
+          // Map through filteredRooms instead of rooms// 
           {rooms.map((item, index) => (
-            <Link key={index} to="/rooms/:roomID">
-                <RoomCard  roomimg={images[index]} roomID={rooms[index]}/>
+            <Link key={index} to="/rooms/:index">
+                <RoomCard  roomImg={images[index]} roomID={rooms[index]}/>
             </Link>
           ))}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
 
