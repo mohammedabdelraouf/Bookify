@@ -1,9 +1,7 @@
-import React from 'react'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { AppContext } from '../Context/AppContext'
-import RoomCard from '../Components/RoomCard';
-import assets from '../assets/assets';
+import RoomCard from '../Components/RoomCard'
 
 const  Rooms = () => {
   const RoomsData = useContext(AppContext);
@@ -12,23 +10,9 @@ const  Rooms = () => {
     type: 'all',
     capacity: 1
   });
- 
- const[filteredRooms, setFilteredRooms] = useState([]);
-
-  // useEffect(() => {
-  //   let rooms = RoomsData;
-  //     // Apply price filter
-  //     rooms = rooms.filter(room => room.price >= filter.price[0] && room.price <= filter.price[1]);
-  //   // Apply type filter
-  //     rooms = rooms.filter(room => room.type === filter.type);
-  //   // Apply capacity filter
-  //     rooms = rooms.filter(room => room.capacity >= filter.capacity);
-  //     setFilteredRooms(rooms);}, [filter, RoomsData]);
-
 
   // Get actual rooms from AppContext
   const { rooms } = RoomsData;
-  const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
 
   const [sortBy, setSortBy] = useState('price-asc');
 
@@ -79,10 +63,9 @@ const  Rooms = () => {
 
       <section id='rooms-container' className="flex-1 ">
         <div className="flex flex-col gap-5 p-10 ">
-          // Map through filteredRooms instead of rooms// 
-          {rooms.map((item, index) => (
-            <Link key={index} to="/rooms/:index">
-                <RoomCard  roomImg={images[index]} roomID={rooms[index]}/>
+          {rooms.map((room) => (
+            <Link key={room.id} to={`/rooms/${room.id}`}>
+                <RoomCard roomData={room}/>
             </Link>
           ))}
         </div>

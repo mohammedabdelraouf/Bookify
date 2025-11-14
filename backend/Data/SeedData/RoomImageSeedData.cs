@@ -5,7 +5,6 @@ namespace backend.Data.SeedData
         public static List<RoomImage> GetRoomImages()
         {
             var images = new List<RoomImage>();
-            int imageId = 1;
 
             // Define available Cloudinary images
             var cloudinaryImages = new List<(string Url, string PublicId)>
@@ -36,7 +35,7 @@ namespace backend.Data.SeedData
 
                     images.Add(new RoomImage
                     {
-                        ImageId = imageId++,
+                        // Don't set ImageId - let database auto-generate it
                         RoomId = roomId,
                         ImageUrl = url,
                         PublicId = publicId,

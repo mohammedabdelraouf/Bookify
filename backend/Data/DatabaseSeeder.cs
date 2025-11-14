@@ -14,10 +14,26 @@ namespace backend.Data
 
         public async Task SeedAsync()
         {
-            // Check if data already exists (idempotent operation)
-            if (await _context.RoomTypes.AnyAsync())
+            // Check if room types exist (main check)
+            bool roomTypesExist = await _context.RoomTypes.AnyAsync();
+
+            // Always reseed room images with latest Cloudinary URLs
+            if (await _context.RoomImages.AnyAsync())
             {
-                Console.WriteLine("Database already seeded. Skipping seed operation.");
+                Console.WriteLine("Clearing old room images...");
+                _context.RoomImages.RemoveRange(await _context.RoomImages.ToListAsync());
+                await _context.SaveChangesAsync();
+            }
+
+            if (roomTypesExist)
+            {
+                Console.WriteLine("Database already seeded (except images). Reseeding images with Cloudinary URLs...");
+
+                // Reseed only room images
+                var newRoomImages = RoomImageSeedData.GetRoomImages();
+                await _context.RoomImages.AddRangeAsync(newRoomImages);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"Reseeded {newRoomImages.Count} room images with Cloudinary URLs.");
                 return;
             }
 
@@ -68,26 +84,10 @@ namespace backend.Data
             Console.WriteLine($"Seeded {rooms.Count} rooms.");
 
             // Seed RoomImages (depends on Rooms)
-            var dbRooms = await _context.Rooms.ToListAsync();
-            var roomImages = new List<RoomImage>();
-            
-            // Add placeholder images for all rooms (you can customize this)
-            foreach (var room in dbRooms.Take(5)) // Just seed a few images as example
-            {
-                roomImages.Add(new RoomImage 
-                { 
-                    RoomId = room.RoomId, 
-                    ImageUrl = $"https://via.placeholder.com/800x600?text=Room+{room.RoomNumber}",
-                    PublicId = $"room_{room.RoomNumber}_default"
-                });
-            }
-            
-            if (roomImages.Any())
-            {
-                await _context.RoomImages.AddRangeAsync(roomImages);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($"Seeded {roomImages.Count} room images.");
-            }
+            var roomImages = RoomImageSeedData.GetRoomImages();
+            await _context.RoomImages.AddRangeAsync(roomImages);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"Seeded {roomImages.Count} room images.");
 
             Console.WriteLine("Database seeding completed successfully!");
         }
