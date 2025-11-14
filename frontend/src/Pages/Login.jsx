@@ -24,8 +24,7 @@ const Login = () => {
       alert('Please enter a valid email address.');
       return;
     }
-    navigate('/rooms');
-    return;
+
     fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
