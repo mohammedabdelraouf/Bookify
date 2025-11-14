@@ -7,9 +7,11 @@ export const AppContext = createContext();
 // Define a custom hook for easy access to the context
 export const useAppContext = () => useContext(AppContext);
 
+// Export API_BASE_URL as a constant for use in other components
+export const API_BASE_URL = 'https://localhost:7010/api';
+
 const AppContextProvider = ({ children }) => { // Accept children prop
     const navigate = useNavigate();
-    const API_BASE_URL = 'https://localhost:7010/api';
 
     // 2. Use useState to store the actual data and loading/error states
     const [rooms, setRooms] = useState([]);
