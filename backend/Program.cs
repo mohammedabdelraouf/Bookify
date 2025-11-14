@@ -97,6 +97,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Seed database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<BookifyDbContext>();
+    var seeder = new DatabaseSeeder(context);
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
