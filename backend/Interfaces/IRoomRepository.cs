@@ -11,6 +11,11 @@
         Task AddRoomAsync(Room room); // parameter is RoomDto to avoid overposting and because front-end only sends these properties
         Task UpdateRoomAsync(int id,UpdateRoomDto UpdateRoom);
         Task<bool> DeleteRoomAsync(int roomId);
-        
+        // room images
+        Task AddRoomImageAsync(int roomId, RoomImage image);
+        Task<bool> DeleteRoomImageAsync(int imageId);
+        Task<RoomImage?> GetRoomImageByIdAsync(int imageId);
+        Task<Room?> GetRoomWithImagesAsync(int roomId);
+
     }
 }

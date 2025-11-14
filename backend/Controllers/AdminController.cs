@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace backend.Controllers
 {
@@ -11,10 +13,13 @@ namespace backend.Controllers
     {
         private readonly IRoomRepository _roomRepository;
         private readonly IRoomTypeRepository _roomTypeRepository;
-        public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository)
+        private readonly ICloudinaryService _cloudinaryService;
+        public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository,
+            ICloudinaryService cloudinaryService)
         {
             _roomTypeRepository = roomTypeRepository;
             _roomRepository = roomRepository;
+            _cloudinaryService = cloudinaryService;
         }
         [HttpPost("room-types")] // POST: api/Admin/room-types
         public async Task<IActionResult> AddRoomType([FromBody] CreateRoomTypeDto createRoomTypeDto)
@@ -114,7 +119,83 @@ namespace backend.Controllers
             }
             return Ok(new { Message = "Room deleted successfully." });
         }
+        // Room Image methods
+        [Authorize(Roles = "Admin")]
+        [HttpPost("rooms/{roomId}/images")]
+        public async Task<IActionResult> UploadRoomImage(int roomId, IFormFile imageFile)
+        {
+            if (imageFile == null) return BadRequest(new { Message = "Image file is required." });
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest(new { Message = "Invalid image format. Only JPG and PNG are allowed." });
+            }
+            if (imageFile.Length > 5 * 1024 * 1024) // 5 MB limit
+            {
+                return BadRequest(new { Message = "Image size exceeds the 5MB limit." });
+            }
+            var room = await _roomRepository.GetRoomEntityByIdAsync(roomId);
 
-
+            if (room == null) return NotFound(new { Message = "Room not found." });
+            var folder = $"rooms/{roomId}";
+            var (url, publicId) = await _cloudinaryService.UploadImageAsync(imageFile, folder);
+            var roomImage = new RoomImage
+            {
+                ImageUrl = url,
+                PublicId = publicId,
+                IsMain = room.RoomImages == null || !room.RoomImages.Any()
+            };
+            await _roomRepository.AddRoomImageAsync(roomId, roomImage);
+            var dto = new RoomImageDto { ImageId = roomImage.ImageId, Url = roomImage.ImageUrl, IsMain = roomImage.IsMain };
+            return Ok(dto);
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("rooms/{roomId}/images/bulk")]
+        public async Task<IActionResult> UploadRoomImagesBulk(int roomId, List<IFormFile> files)
+        {
+            if (files == null || !files.Any()) return BadRequest("No files provided.");
+            var room = await _roomRepository.GetRoomWithImagesAsync(roomId);
+            if (room == null) return NotFound("Room not found.");
+
+            var results = new List<RoomImageDto>();
+            var folder = $"bookify/rooms/{roomId}";
+
+            foreach (var file in files)
+            {
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                var allowed = new[] { ".jpg", ".jpeg", ".png" };
+                if (!allowed.Contains(ext)) continue; // skip invalid
+                if (file.Length > 5 * 1024 * 1024) continue; // skip too big
+
+                var (url, publicId) = await _cloudinaryService.UploadImageAsync(file, folder);
+                var image = new RoomImage
+                {
+                    ImageUrl = url,
+                    PublicId = publicId,
+                    IsMain = (room.RoomImages == null || !room.RoomImages.Any()) && !results.Any()
+                };
+                await _roomRepository.AddRoomImageAsync(roomId, image);
+                results.Add(new RoomImageDto { ImageId = image.ImageId, Url = image.ImageUrl, IsMain = image.IsMain });
+            }
+
+            return Ok(results);
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("rooms/{roomId}/images/{imageId}")]
+        public async Task<IActionResult> DeleteRoomImage(int roomId, int imageId)
+        {
+            var img = await _roomRepository.GetRoomImageByIdAsync(imageId);
+            if (img == null || img.RoomId != roomId) return NotFound();
+
+            if (!string.IsNullOrEmpty(img.PublicId))
+                await _cloudinaryService.DeleteImageAsync(img.PublicId);
+
+            var ok = await _roomRepository.DeleteRoomImageAsync(imageId);
+            if (!ok) return StatusCode(500, "Failed to delete image.");
+
+            return Ok(new { Message = "Image deleted." });
+        }
+
+    }
 }

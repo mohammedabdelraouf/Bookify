@@ -11,6 +11,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddDbContext<BookifyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+//bind the cloudinary settings from appsettings.json
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(CloudinarySettings.SectionName));
 // bind the JWT settings from appsettings.json
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection(JWTSettings.SectionName));
 var jwtSettings = new JWTSettings();
@@ -75,6 +77,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 var app = builder.Build();
 
 // adding the rules of the user

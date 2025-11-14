@@ -16,5 +16,6 @@
         [ForeignKey("RoomTypeId")]
         public RoomType? RoomType { get; set; } // one room type to many rooms
         public ICollection<Booking>? Bookings { get; set; } //many booking for same room ( the history of room booking )
+        public ICollection<RoomImage>? RoomImages { get; set; } // one room to many images
     }
 }

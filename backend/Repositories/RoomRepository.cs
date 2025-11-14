@@ -73,5 +73,35 @@
             }
             return false;
         }
+        // room images
+        public async Task AddRoomImageAsync(int roomId, RoomImage image)
+        {
+            image.RoomId = roomId;
+            await _context.RoomImages.AddAsync(image);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteRoomImageAsync(int imageId)
+        {
+            var img = await _context.RoomImages.FindAsync(imageId);
+            if(img != null)
+            {
+                _context.RoomImages.Remove(img);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<RoomImage?> GetRoomImageByIdAsync(int imageId)
+        {
+            return await _context.RoomImages.FirstOrDefaultAsync(i => i.ImageId == imageId);
+        }
+        public async Task<Room?> GetRoomWithImagesAsync(int roomId) 
+        {
+            return await _context.Rooms
+                .Include(r => r.RoomImages).Include(r => r.RoomType)
+                .FirstOrDefaultAsync(r => r.RoomId == roomId);
+        }
     }
 }

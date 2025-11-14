@@ -12,5 +12,7 @@
         public string? roomTypeDescription { get; set; }
         public int roomTypeCapacity { get; set; }
         public decimal roomTypePricePerNight { get; set; }
+        // list of image urls
+        public IEnumerable<RoomImageDto> Images { get; set; } = new List<RoomImageDto>();
     }
 }

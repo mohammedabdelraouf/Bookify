@@ -11,6 +11,7 @@
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<RoomImage> RoomImages { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -46,6 +47,10 @@
                 .WithOne(r => r.User)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade); //DeleteBehavior.Cascade: إذا تم حذف مستخدم (User)، يتم حذف جميع الريفيوهات المرتبطة به تلقائياً.
+        
+            builder.Entity<RoomImage>()
+                .HasOne(ri=>ri.Room).WithMany(r=>r.RoomImages)
+                .HasForeignKey(ri=>ri.RoomId).OnDelete(DeleteBehavior.Cascade); // عند حذف غرفة، يتم حذف جميع الصور المرتبطة بها تلقائياً.
         }
     }
 }
