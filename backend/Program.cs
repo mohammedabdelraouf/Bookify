@@ -40,6 +40,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 //---------------------------------------------------------------------------
+
+// Add CORS policy to allow frontend (React) to access the API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();// this line is for directing the request to controllers
 builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpenApi
 builder.Services.AddSwaggerGen(options =>
@@ -114,6 +127,9 @@ if (app.Environment.IsDevelopment())
 }
 // this middleware to redirect http request to https
 app.UseHttpsRedirection();
+
+// Use CORS policy (must come before Authentication and Authorization)
+app.UseCors("AllowReactApp");
 
 // --- 6. إضافة الـ Authentication (مهم جداً!) ---
 app.UseAuthentication(); // <-- لازم ييجي قبل الـ Authorization // لان اصلا الطبيعي انا بشوف انت مسموح تسنخدم السيستم ولا لا

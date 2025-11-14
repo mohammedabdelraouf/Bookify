@@ -26,9 +26,8 @@ const  Rooms = () => {
   //     setFilteredRooms(rooms);}, [filter, RoomsData]);
 
 
-  const{rooms} = {
-    rooms: [1,2,3,4]
-  }
+  // Get actual rooms from AppContext
+  const { rooms } = RoomsData;
   const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
 
   const [sortBy, setSortBy] = useState('price-asc');

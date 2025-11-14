@@ -8,7 +8,7 @@ export const AppContext = createContext();
 export const useAppContext = () => useContext(AppContext);
 
 // Export API_BASE_URL as a constant for use in other components
-export const API_BASE_URL = 'https://localhost:7010/api';
+export const API_BASE_URL = 'http://localhost:5230/api';
 
 const AppContextProvider = ({ children }) => { // Accept children prop
     const navigate = useNavigate();
@@ -60,7 +60,8 @@ const AppContextProvider = ({ children }) => { // Accept children prop
                     capacity: room.roomTypeCapacity,
                     price: room.roomTypePricePerNight
                 }));
-                setDataState(cleanedRooms.filter(room => room.status === 'Available'));
+                // Filter for available rooms (status can be 0 for Available enum or 'Available' string)
+                setDataState(cleanedRooms.filter(room => room.status === 0 || room.status === 'Available'));
             } else {
                 setDataState(data);
             }
