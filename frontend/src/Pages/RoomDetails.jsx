@@ -7,40 +7,50 @@ import { AppContext } from '../Context/AppContext.jsx';
 
 const RoomDetails = () => {
 
-    const {RoomId} = useParams();
-    const {Rooms} = useContext(AppContext);
-    const [RoomData, setRoomData] = useState(false);
+    const { RoomId } = useParams();
+    const { rooms } = useContext(AppContext);
+    const [roomData, setRoomData] = useState(null);
     const [img, setImg] = useState('')
     const navigate = useNavigate();
 
-    const fetchProductData = async ()=>{
-      Rooms.map((item)=>{
-        if (item._id == productId) {
-          setRoomData(item);
-          setImg(item.image[0]);
-        }
-      })
+    const fetchRoomData = async () => {
+      const room = rooms.find((item) => item.id === parseInt(RoomId));
+      if (room) {
+        setRoomData(room);
+        setImg(room.images[0]?.url || '');
+      }
     }
-    useEffect(()=>{
-      fetchProductData();
-    },[RoomId])
+
+    useEffect(() => {
+      fetchRoomData();
+    }, [RoomId, rooms])
+  if (!roomData) {
+    return (
+      <div className='flex justify-center items-center min-h-screen'>
+        <p className='text-xl'>Loading room details...</p>
+      </div>
+    );
+  }
+
   return (
     <>
     <section className='flex flex-col md:flex-row w-[80%] mx-auto my-10 ' >
       <div className='w-full md:w-1/4 overflow-hidden'>
-        <img className='w-full shadow-xl rounded-md' src={assets.room1} alt="" />
+        <img className='w-full shadow-xl rounded-md' src={img || assets.room1} alt={`Room ${roomData.number}`} />
       </div>
         <div className='flex flex-col justify-between p-5 w-full md:w-3/4'>
         <div></div>
-          <h2 className='text-2xl font-bold mb-2'>Room1</h2>
-          <p className='mb-4'>Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Voluptate eius molestiae non quisquam assumenda optio.</p>
+          <h2 className='text-2xl font-bold mb-2'>{roomData.type} Room {roomData.number}</h2>
+          <p className='mb-4'>{roomData.description}</p>
+          <p className='mb-2'><span className='font-semibold'>Capacity:</span> {roomData.capacity} guests</p>
+          <p className='mb-2'><span className='font-semibold'>Floor:</span> {roomData.floor}</p>
+          <p className='mb-2'><span className='font-semibold'>Status:</span> <span className='text-green-600'>{roomData.status}</span></p>
         </div>
         <div className='flex justify-between items-center'>
-          <span className='font-bold text-lg'>$100 / night</span>
+          <span className='font-bold text-lg'>${roomData.price} / night</span>
         </div>
-      
-      
+
+
     </section>
     {/* Reviews Section */}
     <section className='w-[80%] mx-auto my-10'>
