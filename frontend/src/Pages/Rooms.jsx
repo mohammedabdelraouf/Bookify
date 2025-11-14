@@ -12,12 +12,16 @@ const  Rooms = () => {
   });
 
   // Get actual rooms from AppContext
-  const { rooms } = RoomsData;
+  const { rooms, isLoading } = RoomsData;
 
   const [sortBy, setSortBy] = useState('price-asc');
 
   // Apply filters and sorting to rooms
   const filteredAndSortedRooms = useMemo(() => {
+    if (!rooms || rooms.length === 0) {
+      return [];
+    }
+
     let result = [...rooms];
 
     // Filter by price range
@@ -99,7 +103,11 @@ const  Rooms = () => {
 
       <section id='rooms-container' className="flex-1 ">
         <div className="flex flex-col gap-5 p-10 ">
-          {filteredAndSortedRooms.length > 0 ? (
+          {isLoading ? (
+            <div className="text-center text-gray-500 py-10">
+              <p className="text-xl">Loading rooms...</p>
+            </div>
+          ) : filteredAndSortedRooms.length > 0 ? (
             filteredAndSortedRooms.map((room) => (
               <Link key={room.id} to={`/rooms/${room.id}`}>
                 <RoomCard roomData={room}/>
@@ -109,6 +117,7 @@ const  Rooms = () => {
             <div className="text-center text-gray-500 py-10">
               <p className="text-xl">No rooms found matching your filters.</p>
               <p className="mt-2">Try adjusting your search criteria.</p>
+              <p className="mt-2 text-sm">Total rooms available: {rooms?.length || 0}</p>
             </div>
           )}
         </div>
