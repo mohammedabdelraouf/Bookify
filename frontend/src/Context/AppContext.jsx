@@ -47,9 +47,9 @@ const AppContextProvider = ({ children }) => { // Accept children prop
             }
 
             const data = await response.json();
-            
-            if (endpoint.includes('Room')) {
-                // Clean up room data structure as done previously
+
+            if (endpoint.toLowerCase().includes('room')) {
+                // Clean up room data structure
                 const cleanedRooms = data.map(room => ({
                     id: room.roomId,
                     number: room.roomNumber,
@@ -61,13 +61,12 @@ const AppContextProvider = ({ children }) => { // Accept children prop
                     price: room.roomTypePricePerNight,
                     images: room.images || []
                 }));
-                // Filter for available rooms (status can be 0 for Available enum or 'Available' string)
-                setDataState(cleanedRooms.filter(room => room.status === 0 || room.status === 'Available'));
+
+                setDataState(cleanedRooms);
             } else {
                 setDataState(data);
             }
 
-            console.log(`Successfully fetched data from ${endpoint}:`, data);
             return data;
 
         } catch (error) {
