@@ -8,7 +8,6 @@ namespace backend.Data.SeedData
             {
                 new RoomType
                 {
-                    RoomTypeId = 1,
                     Name = "Standard",
                     Capacity = 2,
                     PricePerNight = 80,
@@ -16,7 +15,6 @@ namespace backend.Data.SeedData
                 },
                 new RoomType
                 {
-                    RoomTypeId = 2,
                     Name = "Deluxe",
                     Capacity = 3,
                     PricePerNight = 150,
@@ -24,7 +22,6 @@ namespace backend.Data.SeedData
                 },
                 new RoomType
                 {
-                    RoomTypeId = 3,
                     Name = "Suite",
                     Capacity = 4,
                     PricePerNight = 250,
@@ -32,7 +29,6 @@ namespace backend.Data.SeedData
                 },
                 new RoomType
                 {
-                    RoomTypeId = 4,
                     Name = "Presidential",
                     Capacity = 6,
                     PricePerNight = 500,
