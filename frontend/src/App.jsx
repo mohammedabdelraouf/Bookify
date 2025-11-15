@@ -1,6 +1,7 @@
 import './App.css'
 import Footer from './Components/Footer'
 import NavBar from './Components/NavBar'
+import ProtectedRoute from './Components/ProtectedRoute'
 import Home from './Pages/Home'
 import Login from './Pages/Login.Jsx'
 import Register from './Pages/Register'
@@ -8,6 +9,7 @@ import RoomDetails from './Pages/RoomDetails'
 import Rooms from './Pages/Rooms'
 import Payment from './Pages/Payment'
 import MyBookings from './Pages/MyBookings'
+import AdminDashboard from './Pages/AdminDashboard'
 import { Route, Routes } from 'react-router-dom'
 
 function App() {
@@ -25,6 +27,13 @@ function App() {
           <Route path='/rooms/:RoomId' element={<RoomDetails />} />
           <Route path='rooms/:RoomId/payment' element={<Payment />} />
           <Route path='/my-bookings' element={<MyBookings />} />
+
+          {/* Admin Routes */}
+          <Route path='/admin/dashboard' element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
       </Routes>
       </main>
       <Footer/>
