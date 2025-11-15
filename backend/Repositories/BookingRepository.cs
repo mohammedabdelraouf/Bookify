@@ -96,6 +96,10 @@ namespace backend.Repositories
                     BookingDate = b.BookingDate,
                     TotalCost = b.TotalAmount,
                     Status = b.bookingStatus.ToString(),
+                    // User props (for admin)
+                    UserEmail = b.User.Email,
+                    UserFirstName = b.User.FirstName,
+                    UserLastName = b.User.LastName,
                     //room props
                     RoomNumber = b.Room.RoomNumber,
                     Floor = b.Room.Floor,

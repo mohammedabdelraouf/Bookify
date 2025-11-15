@@ -12,6 +12,11 @@
         public decimal TotalCost { get; set; }
         public string Status { get; set; } // (Pending, Confirmed, Successed, Failed)
 
+        // User info (for admin views)
+        public string? UserEmail { get; set; }
+        public string? UserFirstName { get; set; }
+        public string? UserLastName { get; set; }
+
         // from Room navigation property
         public string RoomNumber { get; set; }
         public int Floor { get; set; }

@@ -220,5 +220,14 @@ namespace backend.Controllers
             return Ok(paymentsData);
         }
 
+        // Customers methods
+        [HttpGet("customers")]
+        public async Task<IActionResult> GetAllCustomers()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            // Return all bookings with user info - frontend will group by user
+            return Ok(bookings);
+        }
+
     }
 }
