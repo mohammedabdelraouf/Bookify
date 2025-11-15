@@ -111,14 +111,20 @@ const Home = () => {
             </div>
           ) : (
             <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {featuredRooms.map((room) => (
+              {featuredRooms.map((room) => {
+                const imageUrl = room.images?.find(img => img.isMain)?.url || room.images?.[0]?.url;
+                return (
                 <div key={room.roomId} className='bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow'>
                   <div className='h-64 bg-gray-200'>
                     {room.images && room.images.length > 0 ? (
                       <img
-                        src={room.images[0]}
+                        src={imageUrl}
                         alt={room.roomTypeName}
                         className='w-full h-full object-cover'
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                        }}
                       />
                     ) : (
                       <div className='w-full h-full flex items-center justify-center text-gray-400'>
@@ -127,21 +133,47 @@ const Home = () => {
                     )}
                   </div>
                   <div className='p-6'>
-                    <h3 className='text-2xl font-bold mb-2'>{room.roomTypeName}</h3>
-                    <p className='text-gray-600 mb-4'>Room {room.roomNumber}</p>
-                    <div className='flex justify-between items-center mb-4'>
-                      <span className='text-3xl font-bold text-teal-600'>${room.pricePerNight}</span>
-                      <span className='text-gray-500'>per night</span>
+                    <div className='flex justify-between items-start mb-3'>
+                      <div>
+                        <h3 className='text-2xl font-bold text-gray-800'>{room.roomTypeName}</h3>
+                        <p className='text-sm text-gray-500'>Room {room.roomNumber}</p>
+                      </div>
+                      <span className='px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full'>
+                        {room.status}
+                      </span>
                     </div>
-                    <button
-                      onClick={() => navigate(`/rooms/${room.roomId}`)}
-                      className='w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition-colors'
-                    >
-                      View Details
-                    </button>
+
+                    <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
+                      {room.roomTypeDescription || 'Comfortable room with modern amenities'}
+                    </p>
+
+                    <div className='flex items-center gap-4 text-sm text-gray-600 mb-4'>
+                      <span className='flex items-center gap-1'>
+                        <span>👤</span>
+                        {room.roomTypeCapacity} guests
+                      </span>
+                      <span className='flex items-center gap-1'>
+                        <span>📍</span>
+                        Floor {room.floor}
+                      </span>
+                    </div>
+
+                    <div className='flex justify-between items-center pt-4 border-t border-gray-200'>
+                      <div>
+                        <span className='text-3xl font-bold text-teal-600'>${room.roomTypePricePerNight}</span>
+                        <span className='text-gray-500 text-sm'> / night</span>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/rooms/${room.roomId}`)}
+                        className='bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-sm hover:shadow-md'
+                      >
+                        Book Now
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
