@@ -46,6 +46,7 @@ const Login = () => {
         // Store token and user info in localStorage
         localStorage.setItem('token', json.token);
         localStorage.setItem('userEmail', json.email);
+        localStorage.setItem('userName', json.firstName);
         localStorage.setItem('userRole', json.roles[0]);
 
         // Update AppContext state
