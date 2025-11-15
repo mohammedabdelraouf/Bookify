@@ -47,7 +47,7 @@ const RoomDetails = () => {
       if (!token) return;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/bookings/user`, {
+        const response = await fetch(`${API_BASE_URL}/bookings/my-bookings`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
