@@ -14,6 +14,7 @@ const Payment = () => {
     const [payMethod, setPayMethod] = useState('cash');
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [processing, setProcessing] = useState(false);
 
     const fetchBookingDetails = async () => {
         const token = localStorage.getItem('token');
@@ -53,17 +54,56 @@ const Payment = () => {
         return nights;
     };
 
-    const handlePayment = (event) => {
+    const handlePayment = async (event) => {
         event.preventDefault();
-        const paymentData = {
-            cardNumber: event.target.cardNumber.value,
-            expiryDate: event.target.expiryDate.value,
-            cvv: event.target.cvv.value,
-            cardHolderName: event.target.cardHolderName.value,
-        };
-        console.log("Processing payment with data:", paymentData);
-        // Add logic to handle payment processing here
 
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to continue');
+            navigate('/login');
+            return;
+        }
+
+        // Create mock transaction ID
+        const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // Prepare payment data
+        const paymentData = {
+            bookingId: bookingId,
+            transactionId: transactionId,
+            paymentMethod: payMethod.charAt(0).toUpperCase() + payMethod.slice(1), // Capitalize first letter
+            amount: booking?.totalAmount || totalAmount
+        };
+
+        setProcessing(true);
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/bookings/confirm-payment`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(paymentData)
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Payment failed');
+            }
+
+            const result = await response.json();
+            // Handle success in Task 6
+            console.log('Payment successful:', result);
+
+        } catch (error) {
+            alert('Payment failed: ' + error.message);
+        } finally {
+            setProcessing(false);
+        }
     };
 
   if (loading) {
@@ -128,7 +168,13 @@ const Payment = () => {
                     <label htmlFor="cardHolderName">Cardholder Name</label>
                     <input className='border rounded-md p-3 shadow-sm hover:border-s-black'  type="text" id="cardHolderName" name="cardHolderName" placeholder="Enter cardholder name" required />
                 </div>
-                <button className='bg-green-400 p-2  w-full rounded text-white font-bold hover:bg-green-500 transition-colors' type="submit">Pay Now</button>
+                <button
+                    disabled={processing}
+                    className={`bg-green-400 p-2 w-full rounded text-white font-bold hover:bg-green-500 transition-colors ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    type="submit"
+                >
+                    {processing ? 'Processing...' : 'Confirm Payment'}
+                </button>
             </form>
         </div>
     </main>
