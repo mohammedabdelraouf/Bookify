@@ -113,8 +113,8 @@ const RoomDetails = () => {
       // Prepare booking data
       const bookingData = {
         roomId: parseInt(RoomId),
-        checkInDate: checkInDate,
-        checkOutDate: checkOutDate
+        checkIn: checkInDate,
+        checkOut: checkOutDate
       };
 
       setIsBooking(true);
