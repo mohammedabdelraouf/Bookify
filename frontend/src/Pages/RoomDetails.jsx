@@ -12,6 +12,8 @@ const RoomDetails = () => {
     const [roomData, setRoomData] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [reviews, setReviews] = useState([]);
+    const [checkInDate, setCheckInDate] = useState('');
+    const [checkOutDate, setCheckOutDate] = useState('');
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
@@ -145,16 +147,36 @@ const RoomDetails = () => {
       </div>
     </section>
     {/*choose time for booking section*/}
-    <form onSubmit={(e) => { e.preventDefault(); navigate('/rooms/5/payment'); }}
+    <form onSubmit={(e) => { e.preventDefault(); navigate(`/rooms/${RoomId}/payment`); }}
  className='w-[80%] mx-auto my-10 bg-[rgba(10,10,10,0.2)] p-5 rounded-2xl'>
-      <h3 className='text-xl font-bold mb-4'>Please choose date </h3>
+      <h3 className='text-xl font-bold mb-4'>Book This Room</h3>
       <div className='flex flex-col md:flex-row gap-4'>
-         <input required type="date" className='p-2 border rounded w-full md:w-1/4' />
-         <input required type="date" className='p-2 border rounded w-full md:w-1/4' />
+        <div className='flex flex-col w-full md:w-1/4'>
+          <label className='mb-2 font-semibold'>Check-in Date</label>
+          <input
+            required
+            type="date"
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]}
+            className='p-2 border rounded'
+          />
+        </div>
+        <div className='flex flex-col w-full md:w-1/4'>
+          <label className='mb-2 font-semibold'>Check-out Date</label>
+          <input
+            required
+            type="date"
+            value={checkOutDate}
+            onChange={(e) => setCheckOutDate(e.target.value)}
+            min={checkInDate || new Date().toISOString().split('T')[0]}
+            className='p-2 border rounded'
+          />
+        </div>
       </div>
       <div className='flex flex-col w-full md:w-1/4 justify-center align-items-center my-5'>
-       <button  className='bg-green-400 p-2  w-8/12  rounded text-white font-bold hover:bg-green-500 transition-colors'>
-            Pay Now
+       <button className='bg-green-400 p-2 w-8/12 rounded text-white font-bold hover:bg-green-500 transition-colors'>
+            Book Now
         </button>
       </div>
     </form>
