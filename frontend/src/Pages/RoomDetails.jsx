@@ -2,7 +2,7 @@ import React from 'react'
 import assets from '../assets/assets'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useContext, useEffect } from 'react'
-import { AppContext, API_BASE_URL } from '../Context/AppContext.jsx';
+import { AppContext, API_BASE_URL, useAppContext } from '../Context/AppContext.jsx';
 
 
 const RoomDetails = () => {
@@ -63,6 +63,29 @@ const RoomDetails = () => {
       }
 
       return true;
+    };
+
+    const handleBooking = async () => {
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to book a room');
+        navigate('/login');
+        return;
+      }
+
+      // Validate dates
+      if (!validateBookingDates()) return;
+
+      // Prepare booking data
+      const bookingData = {
+        roomId: parseInt(RoomId),
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate
+      };
+
+      // API call in next task
+      console.log('Booking data prepared:', bookingData);
     };
 
   if (!roomData) {
@@ -174,9 +197,7 @@ const RoomDetails = () => {
     {/*choose time for booking section*/}
     <form onSubmit={(e) => {
       e.preventDefault();
-      if (validateBookingDates()) {
-        navigate(`/rooms/${RoomId}/payment`);
-      }
+      handleBooking();
     }}
  className='w-[80%] mx-auto my-10 bg-[rgba(10,10,10,0.2)] p-5 rounded-2xl'>
       <h3 className='text-xl font-bold mb-4'>Book This Room</h3>
