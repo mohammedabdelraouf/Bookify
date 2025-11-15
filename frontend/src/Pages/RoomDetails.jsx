@@ -2,7 +2,7 @@ import React from 'react'
 import assets from '../assets/assets'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useContext, useEffect } from 'react'
-import { AppContext } from '../Context/AppContext.jsx';
+import { AppContext, API_BASE_URL } from '../Context/AppContext.jsx';
 
 
 const RoomDetails = () => {
@@ -11,6 +11,7 @@ const RoomDetails = () => {
     const { rooms } = useContext(AppContext);
     const [roomData, setRoomData] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [reviews, setReviews] = useState([]);
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
@@ -21,8 +22,21 @@ const RoomDetails = () => {
       }
     }
 
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/reviews/room/${RoomId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setReviews(data);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    }
+
     useEffect(() => {
       fetchRoomData();
+      fetchReviews();
     }, [RoomId, rooms])
   if (!roomData) {
     return (
@@ -108,10 +122,26 @@ const RoomDetails = () => {
     </section>
     {/* Reviews Section */}
     <section className='w-[80%] mx-auto my-10'>
-      <h3 className='text-xl font-bold mb-4'>Reviews</h3>
+      <h3 className='text-xl font-bold mb-4'>Customer Reviews</h3>
       <div className='border-t pt-4'>
-        <p className='mb-2'><span className='font-bold'>User1:</span> Great room, very comfortable!</p>
-        <p className='mb-2'><span className='font-bold'>User2:</span> Excellent service and amenities.</p>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review.reviewId} className='mb-4 p-4 bg-gray-50 rounded'>
+              <div className='flex items-center justify-between mb-2'>
+                <span className='font-semibold'>{review.userName || 'Anonymous'}</span>
+                <span className='text-yellow-500'>
+                  {'⭐'.repeat(review.rating)}
+                </span>
+              </div>
+              <p className='text-gray-700 mb-2'>{review.comment}</p>
+              <p className='text-sm text-gray-500'>
+                {new Date(review.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className='text-gray-500'>No reviews yet. Be the first to review this room!</p>
+        )}
       </div>
     </section>
     {/*choose time for booking section*/}
