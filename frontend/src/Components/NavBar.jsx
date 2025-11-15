@@ -5,6 +5,7 @@ import { Link, NavLink } from 'react-router-dom'
 const NavBar = () => {
   const { loggedIn, logout } = useAppContext();
   const userName = localStorage.getItem('userName');
+  const userRole = localStorage.getItem('userRole');
   return (
     <div className='w-100 bg-teal-800 text-white flex flex-row px-5 md:px-20 align-middle py-4  justify-between items-center '>
       <h1 className='text-2xl font-bold'><Link to="/"> Bookify </Link></h1>
@@ -15,6 +16,11 @@ const NavBar = () => {
         <li>
           <NavLink to="/rooms">Rooms</NavLink>
         </li>
+        {loggedIn && userRole === 'Admin' && (
+          <li>
+            <NavLink to="/admin/dashboard">Admin Dashboard</NavLink>
+          </li>
+        )}
         {loggedIn && (
           <li>
             <NavLink to="/my-bookings">My Bookings</NavLink>
