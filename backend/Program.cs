@@ -99,6 +99,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Create roles
     string[] roles = { "Admin", "Customer"};
     foreach (var role in roles)
     {
@@ -106,6 +109,32 @@ using (var scope = app.Services.CreateScope())
         if (!roleExist)
         {
             await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // Create default admin user
+    var adminEmail = "admin@bookify.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        var newAdmin = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FirstName = "Admin",
+            LastName = "User",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(newAdmin, "Admin@123");
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin, "Admin");
+            Console.WriteLine("Default admin user created successfully!");
+            Console.WriteLine($"Email: {adminEmail}");
+            Console.WriteLine("Password: Admin@123");
         }
     }
 }
