@@ -7,6 +7,7 @@ import Register from './Pages/Register'
 import RoomDetails from './Pages/RoomDetails'
 import Rooms from './Pages/Rooms'
 import Payment from './Pages/Payment'
+import MyBookings from './Pages/MyBookings'
 import { Route, Routes } from 'react-router-dom'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path='/signup' element={<Register />} />
           <Route path='/rooms/:RoomId' element={<RoomDetails />} />
           <Route path='rooms/:RoomId/payment' element={<Payment />} />
+          <Route path='/my-bookings' element={<MyBookings />} />
       </Routes>
       </main>
       <Footer/>

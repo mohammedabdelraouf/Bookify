@@ -17,6 +17,12 @@ const NavBar = () => {
           <p>Rooms</p>
           <hr className='border-red-950  border-2 hidden' />
         </NavLink>
+        {loggedIn && (
+          <NavLink to="/my-bookings">
+            <p>My Bookings</p>
+            <hr className='border-red-950  border-2 hidden' />
+          </NavLink>
+        )}
         <NavLink className={loggedIn? 'hidden': 'block'} to="/login">
           <p>Login</p>
           <hr className='border-red-950  border-2 hidden' />
