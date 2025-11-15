@@ -10,14 +10,14 @@ const RoomDetails = () => {
     const { RoomId } = useParams();
     const { rooms } = useContext(AppContext);
     const [roomData, setRoomData] = useState(null);
-    const [img, setImg] = useState('')
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
       const room = rooms.find((item) => item.id === parseInt(RoomId));
       if (room) {
         setRoomData(room);
-        setImg(room.images[0]?.url || '');
+        setCurrentImageIndex(0);
       }
     }
 
@@ -32,25 +32,79 @@ const RoomDetails = () => {
     );
   }
 
+  const currentImage = roomData.images[currentImageIndex]?.url || assets.room1;
+  const totalImages = roomData.images.length;
+
   return (
     <>
-    <section className='flex flex-col md:flex-row w-[80%] mx-auto my-10 ' >
-      <div className='w-full md:w-1/4 overflow-hidden'>
-        <img className='w-full shadow-xl rounded-md' src={img || assets.room1} alt={`Room ${roomData.number}`} />
+    <section className='w-[80%] mx-auto my-10'>
+      {/* Image Gallery */}
+      <div className='mb-8'>
+        {/* Main Image */}
+        <div className='relative mb-4'>
+          <img
+            className='w-full h-96 object-cover shadow-xl rounded-md'
+            src={currentImage}
+            alt={`Room ${roomData.number} - Image ${currentImageIndex + 1}`}
+          />
+          {totalImages > 0 && (
+            <div className='absolute bottom-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded'>
+              {currentImageIndex + 1} / {totalImages}
+            </div>
+          )}
+          {/* Navigation Arrows */}
+          {totalImages > 1 && (
+            <>
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? totalImages - 1 : prev - 1))}
+                className='absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80'
+              >
+                ←
+              </button>
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === totalImages - 1 ? 0 : prev + 1))}
+                className='absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80'
+              >
+                →
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Thumbnail Gallery */}
+        {totalImages > 1 && (
+          <div className='flex gap-2 overflow-x-auto'>
+            {roomData.images.map((image, index) => (
+              <img
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                className={`w-20 h-20 object-cover rounded cursor-pointer border-2 ${
+                  index === currentImageIndex ? 'border-blue-500' : 'border-gray-300'
+                } hover:border-blue-400 transition-all`}
+                src={image.url}
+                alt={`Thumbnail ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
-        <div className='flex flex-col justify-between p-5 w-full md:w-3/4'>
-        <div></div>
+
+      {/* Room Details */}
+      <div className='flex flex-col md:flex-row gap-6'>
+        <div className='flex-1'>
           <h2 className='text-2xl font-bold mb-2'>{roomData.type} Room {roomData.number}</h2>
           <p className='mb-4'>{roomData.description}</p>
           <p className='mb-2'><span className='font-semibold'>Capacity:</span> {roomData.capacity} guests</p>
           <p className='mb-2'><span className='font-semibold'>Floor:</span> {roomData.floor}</p>
           <p className='mb-2'><span className='font-semibold'>Status:</span> <span className='text-green-600'>{roomData.status}</span></p>
         </div>
-        <div className='flex justify-between items-center'>
-          <span className='font-bold text-lg'>${roomData.price} / night</span>
+        <div className='md:w-1/3'>
+          <div className='bg-gray-100 p-6 rounded-lg'>
+            <span className='font-bold text-3xl text-blue-600'>${roomData.price}</span>
+            <span className='text-gray-600'> / night</span>
+          </div>
         </div>
-
-
+      </div>
     </section>
     {/* Reviews Section */}
     <section className='w-[80%] mx-auto my-10'>
