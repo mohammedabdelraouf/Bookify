@@ -76,6 +76,15 @@ const AppContextProvider = ({ children }) => { // Accept children prop
         }
     };
 
+    // Logout function
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userRole');
+        setLoggedIn(false);
+        navigate('/login');
+    };
+
     // 4. useEffect to call fetch functions once on mount
     useEffect(() => {
         const fetchAllData = async () => {
@@ -104,9 +113,10 @@ const AppContextProvider = ({ children }) => { // Accept children prop
 
         // Functions
         setLoggedIn,
+        logout,
         navigate,
         fetchData, // Expose fetchData if components need to refresh data manually
-    }), [rooms, users, bookings, isLoading, error, loggedIn, setLoggedIn, navigate, fetchData]);
+    }), [rooms, users, bookings, isLoading, error, loggedIn, logout]);
 
     // 6. Provide the context
     return (
