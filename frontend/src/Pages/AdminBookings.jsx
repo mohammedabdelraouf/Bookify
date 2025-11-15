@@ -6,6 +6,8 @@ const AdminBookings = () => {
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchAllBookings();
@@ -76,6 +78,16 @@ const AdminBookings = () => {
       default:
         return 'text-gray-600';
     }
+  };
+
+  const openBookingDetails = (booking) => {
+    setSelectedBooking(booking);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedBooking(null);
   };
 
   if (loading) {
@@ -173,6 +185,9 @@ const AdminBookings = () => {
                     <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Payment
                     </th>
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className='bg-white divide-y divide-gray-200'>
@@ -222,6 +237,14 @@ const AdminBookings = () => {
                           {booking.paymentMethod}
                         </div>
                       </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm'>
+                        <button
+                          onClick={() => openBookingDetails(booking)}
+                          className='text-teal-600 hover:text-teal-800 font-medium'
+                        >
+                          View Details
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -245,6 +268,181 @@ const AdminBookings = () => {
           </div>
         )}
       </div>
+
+      {/* Booking Details Modal */}
+      {showModal && selectedBooking && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
+          <div className='bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
+            {/* Modal Header */}
+            <div className='sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center'>
+              <h2 className='text-2xl font-bold text-gray-800'>
+                Booking Details - #{selectedBooking.bookingId}
+              </h2>
+              <button
+                onClick={closeModal}
+                className='text-gray-500 hover:text-gray-700 text-2xl font-bold'
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className='p-6 space-y-6'>
+              {/* Customer Section */}
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2'>
+                  <span>👤</span> Customer Information
+                </h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm text-gray-600'>Name</p>
+                    <p className='font-medium text-gray-900'>
+                      {selectedBooking.userFirstName} {selectedBooking.userLastName}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Email</p>
+                    <p className='font-medium text-gray-900'>{selectedBooking.userEmail}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Room Section */}
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2'>
+                  <span>🏨</span> Room Details
+                </h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm text-gray-600'>Room Type</p>
+                    <p className='font-medium text-gray-900'>{selectedBooking.roomTypeName}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Room Number</p>
+                    <p className='font-medium text-gray-900'>{selectedBooking.roomNumber}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Floor</p>
+                    <p className='font-medium text-gray-900'>Floor {selectedBooking.floor}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Section */}
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2'>
+                  <span>📅</span> Booking Information
+                </h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm text-gray-600'>Booking Date</p>
+                    <p className='font-medium text-gray-900'>
+                      {new Date(selectedBooking.bookingDate).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Status</p>
+                    <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(selectedBooking.status)}`}>
+                      {selectedBooking.status}
+                    </span>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Check-in Date</p>
+                    <p className='font-medium text-gray-900'>
+                      {new Date(selectedBooking.checkInDate).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Check-out Date</p>
+                    <p className='font-medium text-gray-900'>
+                      {new Date(selectedBooking.checkOutDate).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Duration</p>
+                    <p className='font-medium text-gray-900'>
+                      {Math.ceil((new Date(selectedBooking.checkOutDate) - new Date(selectedBooking.checkInDate)) / (1000 * 60 * 60 * 24))} nights
+                    </p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Total Cost</p>
+                    <p className='font-bold text-lg text-teal-600'>${selectedBooking.totalCost}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Section */}
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2'>
+                  <span>💳</span> Payment Information
+                </h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <p className='text-sm text-gray-600'>Payment Method</p>
+                    <p className='font-medium text-gray-900'>{selectedBooking.paymentMethod}</p>
+                  </div>
+                  <div>
+                    <p className='text-sm text-gray-600'>Payment Status</p>
+                    <span className={`inline-block font-semibold ${getPaymentStatusColor(selectedBooking.paymentStatus)}`}>
+                      {selectedBooking.paymentStatus}
+                    </span>
+                  </div>
+                  {selectedBooking.transactionId && (
+                    <div className='col-span-2'>
+                      <p className='text-sm text-gray-600'>Transaction ID</p>
+                      <p className='font-mono text-sm text-gray-900'>{selectedBooking.transactionId}</p>
+                    </div>
+                  )}
+                  {selectedBooking.paymentDate && (
+                    <div>
+                      <p className='text-sm text-gray-600'>Payment Date</p>
+                      <p className='font-medium text-gray-900'>
+                        {new Date(selectedBooking.paymentDate).toLocaleDateString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Review Status */}
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2'>
+                  <span>⭐</span> Review Status
+                </h3>
+                <p className='font-medium text-gray-900'>
+                  {selectedBooking.hasReview ? 'Customer has submitted a review' : 'No review submitted yet'}
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className='sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end'>
+              <button
+                onClick={closeModal}
+                className='bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors'
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
