@@ -20,5 +20,8 @@
         // from payment navigation property
         public string PaymentMethod { get; set; } // (Stripe, CashOnArrival)
         public string PaymentStatus { get; set; } // (Succeeded, Pending, Failed)
+
+        // Review status
+        public bool HasReview { get; set; } // true if user has already reviewed this booking
     }
 }

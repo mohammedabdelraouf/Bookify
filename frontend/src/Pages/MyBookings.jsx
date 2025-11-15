@@ -5,6 +5,11 @@ import { API_BASE_URL } from '../Context/AppContext.jsx';
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +43,92 @@ const MyBookings = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openReviewModal = (booking) => {
+    setSelectedBooking(booking);
+    setRating(0);
+    setComment('');
+    setShowReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setShowReviewModal(false);
+    setSelectedBooking(null);
+    setRating(0);
+    setComment('');
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+
+    if (rating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+
+    if (comment.trim().length < 10) {
+      alert('Comment must be at least 10 characters long');
+      return;
+    }
+
+    if (comment.length > 500) {
+      alert('Comment must be less than 500 characters');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please login to submit a review');
+      navigate('/login');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookingId: selectedBooking.bookingId,
+          rating: rating,
+          comment: comment.trim()
+        })
+      });
+
+      if (response.ok) {
+        alert('Review submitted successfully!');
+        closeReviewModal();
+        fetchMyBookings(); // Refresh bookings to update hasReview status
+      } else {
+        const error = await response.json();
+        alert('Error: ' + (error.message || 'Failed to submit review'));
+      }
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      alert('Failed to submit review. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const canWriteReview = (booking) => {
+    const token = localStorage.getItem('token');
+    if (!token) return false; // User must be logged in
+
+    if (booking.status !== 'Confirmed') return false; // Booking must be confirmed
+
+    const checkoutDate = new Date(booking.checkOutDate);
+    const now = new Date();
+    if (checkoutDate > now) return false; // Checkout date must have passed
+
+    if (booking.hasReview) return false; // User hasn't already reviewed
+
+    return true;
   };
 
   const getStatusColor = (status) => {
@@ -140,14 +231,104 @@ const MyBookings = () => {
               </div>
 
               <div className='mt-4 text-sm text-gray-500'>
-                Booked on: {new Date(booking.createdAt).toLocaleDateString('en-US', {
+                Booked on: {new Date(booking.bookingDate).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 })}
               </div>
+
+              {canWriteReview(booking) && (
+                <div className='mt-4 pt-4 border-t'>
+                  <button
+                    onClick={() => openReviewModal(booking)}
+                    className='bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-sm hover:shadow-md'
+                  >
+                    Write Review
+                  </button>
+                </div>
+              )}
+
+              {booking.hasReview && (
+                <div className='mt-4 pt-4 border-t'>
+                  <p className='text-sm text-green-600 font-medium'>✓ You have reviewed this booking</p>
+                </div>
+              )}
             </div>
           ))}
+        </div>
+      )}
+
+      {showReviewModal && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
+          <div className='bg-white rounded-lg shadow-xl max-w-md w-full p-6'>
+            <h2 className='text-2xl font-bold mb-4'>Write a Review</h2>
+            <p className='text-gray-600 mb-4'>
+              {selectedBooking?.roomTypeName} - Room {selectedBooking?.roomNumber}
+            </p>
+
+            <form onSubmit={handleSubmitReview}>
+              <div className='mb-4'>
+                <label className='block text-sm font-semibold mb-2'>Rating *</label>
+                <div className='flex gap-2'>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type='button'
+                      onClick={() => setRating(star)}
+                      className={`text-3xl ${
+                        star <= rating ? 'text-yellow-500' : 'text-gray-300'
+                      } hover:text-yellow-400 transition-colors`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                {rating > 0 && (
+                  <p className='text-sm text-gray-600 mt-1'>
+                    {rating} star{rating > 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+
+              <div className='mb-6'>
+                <label className='block text-sm font-semibold mb-2'>
+                  Comment * (10-500 characters)
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder='Share your experience with this room...'
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500'
+                  rows='4'
+                  required
+                  minLength={10}
+                  maxLength={500}
+                />
+                <p className='text-xs text-gray-500 mt-1'>
+                  {comment.length}/500 characters
+                </p>
+              </div>
+
+              <div className='flex gap-3'>
+                <button
+                  type='button'
+                  onClick={closeReviewModal}
+                  className='flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2.5 rounded-lg transition-colors'
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='flex-1 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                  disabled={submitting || rating === 0 || comment.trim().length < 10}
+                >
+                  {submitting ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
