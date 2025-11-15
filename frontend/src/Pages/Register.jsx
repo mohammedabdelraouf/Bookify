@@ -12,6 +12,7 @@ const Register = () => {
     confirmPassword: ''
   })
   const [errors, setErrors] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -65,7 +66,7 @@ const Register = () => {
     return newErrors
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     const newErrors = validateForm()
@@ -75,8 +76,34 @@ const Register = () => {
       return
     }
 
-    // Form submission will be implemented in next task
-    console.log('Form validated successfully:', formData)
+    setIsLoading(true)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/accounts/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Registration failed')
+      }
+
+      // Success - show message and navigate to login
+      alert('Registration successful! Please login with your credentials.')
+      navigate('/login')
+
+    } catch (error) {
+      alert(error.message || 'Registration failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -159,10 +186,11 @@ const Register = () => {
           </div>
 
           <button
-            className='rounded text-center bg-green-400 p-2 text-white font-bold hover:bg-green-500 transition-colors'
+            className='rounded text-center bg-green-400 p-2 text-white font-bold hover:bg-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed'
             type="submit"
+            disabled={isLoading}
           >
-            Register
+            {isLoading ? 'Registering...' : 'Register'}
           </button>
 
           <div style={{ fontSize: 12 }}>
