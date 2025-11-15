@@ -103,8 +103,24 @@ const RoomDetails = () => {
         }
 
         const result = await response.json();
-        // Handle success in next task
-        console.log('Booking created:', result);
+
+        // Show success message
+        alert('Booking created successfully!');
+
+        // Navigate to payment page with booking data
+        navigate(`/rooms/${RoomId}/payment`, {
+          state: {
+            bookingId: result.bookingId,
+            roomNumber: roomData.number,
+            checkInDate,
+            checkOutDate,
+            totalAmount: result.totalAmount
+          }
+        });
+
+        // Clear form
+        setCheckInDate('');
+        setCheckOutDate('');
 
       } catch (error) {
         alert('Booking failed: ' + error.message);
