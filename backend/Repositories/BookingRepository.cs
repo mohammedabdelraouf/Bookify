@@ -68,8 +68,11 @@ namespace backend.Repositories
                     Floor = b.Room.Floor,
                     RoomTypeName = b.Room.RoomType.Name,
                     // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
                     PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
                     PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
                     // Review status
                     HasReview = b.Review != null
 
@@ -98,8 +101,11 @@ namespace backend.Repositories
                     Floor = b.Room.Floor,
                     RoomTypeName = b.Room.RoomType.Name,
                     // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
                     PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
                     PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
                     // Review status
                     HasReview = b.Review != null
                 })
@@ -128,8 +134,11 @@ namespace backend.Repositories
                     Floor = b.Room.Floor,
                     RoomTypeName = b.Room.RoomType.Name,
                     // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
                     PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
                     PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
                     // Review status
                     HasReview = b.Review != null
                 })

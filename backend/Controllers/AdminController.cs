@@ -207,5 +207,18 @@ namespace backend.Controllers
             return Ok(bookings);
         }
 
+        // Payments methods
+        [HttpGet("payments")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            // Filter to only include bookings with actual payments
+            var paymentsData = bookings
+                .Where(b => b.PaymentId.HasValue)
+                .OrderByDescending(b => b.PaymentDate)
+                .ToList();
+            return Ok(paymentsData);
+        }
+
     }
 }

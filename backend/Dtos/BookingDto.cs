@@ -18,8 +18,11 @@
         // from RoomType navigation property
         public string RoomTypeName { get; set; }
         // from payment navigation property
+        public int? PaymentId { get; set; }
         public string PaymentMethod { get; set; } // (Stripe, CashOnArrival)
         public string PaymentStatus { get; set; } // (Succeeded, Pending, Failed)
+        public DateTime? PaymentDate { get; set; }
+        public string? TransactionId { get; set; }
 
         // Review status
         public bool HasReview { get; set; } // true if user has already reviewed this booking

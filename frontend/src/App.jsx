@@ -12,6 +12,7 @@ import MyBookings from './Pages/MyBookings'
 import AdminDashboard from './Pages/AdminDashboard'
 import AdminBookings from './Pages/AdminBookings'
 import AdminRooms from './Pages/AdminRooms'
+import AdminPayments from './Pages/AdminPayments'
 import { Route, Routes } from 'react-router-dom'
 
 function App() {
@@ -44,6 +45,11 @@ function App() {
           <Route path='/admin/rooms' element={
             <ProtectedRoute>
               <AdminRooms />
+            </ProtectedRoute>
+          } />
+          <Route path='/admin/payments' element={
+            <ProtectedRoute>
+              <AdminPayments />
             </ProtectedRoute>
           } />
       </Routes>
