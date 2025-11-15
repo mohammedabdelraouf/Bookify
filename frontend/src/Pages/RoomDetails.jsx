@@ -132,6 +132,57 @@ const RoomDetails = () => {
       }
     };
 
+    const handleSubmitReview = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to submit a review');
+        navigate('/login');
+        return;
+      }
+
+      if (!comment.trim()) {
+        alert('Please write a comment');
+        return;
+      }
+
+      // userBookingId will be set in Task 8
+      const userBookingId = null; // Placeholder - will get from state in Task 8
+
+      if (!userBookingId) {
+        alert('You must have a confirmed booking to review this room');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            bookingId: userBookingId,
+            rating: parseInt(rating),
+            comment: comment
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Review submission failed');
+        }
+
+        alert('Review submitted successfully!');
+        setComment('');
+        setRating(5);
+        setShowReviewForm(false);
+        fetchReviews(); // Refresh reviews list
+
+      } catch (error) {
+        alert('Failed to submit review: ' + error.message);
+      }
+    };
+
   if (!roomData) {
     return (
       <div className='flex justify-center items-center min-h-screen'>
@@ -281,7 +332,7 @@ const RoomDetails = () => {
 
           <div className='flex gap-4'>
             <button
-              onClick={() => {/* handleSubmitReview in next task */}}
+              onClick={handleSubmitReview}
               className='bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors'
             >
               Submit Review
