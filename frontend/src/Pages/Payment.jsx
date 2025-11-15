@@ -46,6 +46,13 @@ const Payment = () => {
         }
     }, [bookingId, navigate]);
 
+    const calculateNights = () => {
+        const checkIn = new Date(booking?.checkInDate || checkInDate);
+        const checkOut = new Date(booking?.checkOutDate || checkOutDate);
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        return nights;
+    };
+
     const handlePayment = (event) => {
         event.preventDefault();
         const paymentData = {
@@ -58,8 +65,34 @@ const Payment = () => {
         // Add logic to handle payment processing here
 
     };
+
+  if (loading) {
+    return (
+      <div className='flex justify-center items-center min-h-screen'>
+        <p className='text-xl'>Loading booking details...</p>
+      </div>
+    );
+  }
+
   return (
-    <main className='w-8/12 mx-auto mt-8 mb-8'>  
+    <main className='w-8/12 mx-auto mt-8 mb-8'>
+        {/* Booking Summary */}
+        <div className='bg-white rounded-lg shadow-lg p-6 mb-6'>
+            <h2 className='text-2xl font-bold mb-4'>Booking Summary</h2>
+            <div className='space-y-2'>
+                <p><strong>Room Number:</strong> {booking?.roomNumber || roomNumber}</p>
+                <p><strong>Check-in:</strong> {new Date(booking?.checkInDate || checkInDate).toLocaleDateString()}</p>
+                <p><strong>Check-out:</strong> {new Date(booking?.checkOutDate || checkOutDate).toLocaleDateString()}</p>
+                <p><strong>Total Nights:</strong> {calculateNights()}</p>
+                <p className='text-xl font-bold text-green-600'>
+                    <strong>Total Amount:</strong> ${booking?.totalAmount || totalAmount}
+                </p>
+                <p><strong>Status:</strong>
+                    <span className='text-yellow-600'> {booking?.bookingStatus || 'Pending'}</span>
+                </p>
+            </div>
+        </div>
+
         <div className='flex flex-col md:flex-row gap-5 justify-center items-center '>
             <div className='flex gap-3 flex-col'>
                 <Title text1={"PAYMENT"} text2={'METHOD'} />
