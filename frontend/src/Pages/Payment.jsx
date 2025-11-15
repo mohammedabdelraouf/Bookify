@@ -96,8 +96,16 @@ const Payment = () => {
             }
 
             const result = await response.json();
-            // Handle success in Task 6
-            console.log('Payment successful:', result);
+
+            // Show success message
+            alert('Payment successful! Your booking is confirmed.');
+
+            // Navigate to rooms page
+            navigate('/rooms', {
+                state: {
+                    message: 'Booking confirmed successfully!'
+                }
+            });
 
         } catch (error) {
             alert('Payment failed: ' + error.message);
