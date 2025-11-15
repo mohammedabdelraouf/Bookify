@@ -18,6 +18,8 @@ const RoomDetails = () => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [showReviewForm, setShowReviewForm] = useState(false);
+    const [userBookingId, setUserBookingId] = useState(null);
+    const [canReview, setCanReview] = useState(false);
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
@@ -40,9 +42,36 @@ const RoomDetails = () => {
       }
     }
 
+    const checkUserBooking = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/bookings/user`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const bookings = await response.json();
+          const confirmedBooking = bookings.find(b =>
+            b.roomId === parseInt(RoomId) &&
+            b.bookingStatus === 'Confirmed'
+          );
+
+          if (confirmedBooking) {
+            setUserBookingId(confirmedBooking.bookingId);
+            setCanReview(true);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking bookings:', err);
+      }
+    };
+
     useEffect(() => {
       fetchRoomData();
       fetchReviews();
+      checkUserBooking();
     }, [RoomId, rooms])
 
     const validateBookingDates = () => {
@@ -144,9 +173,6 @@ const RoomDetails = () => {
         alert('Please write a comment');
         return;
       }
-
-      // userBookingId will be set in Task 8
-      const userBookingId = null; // Placeholder - will get from state in Task 8
 
       if (!userBookingId) {
         alert('You must have a confirmed booking to review this room');
@@ -290,7 +316,7 @@ const RoomDetails = () => {
       </div>
 
       {/* Write Review Button */}
-      {!showReviewForm && (
+      {canReview && !showReviewForm && (
         <button
           onClick={() => setShowReviewForm(true)}
           className='mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors'
