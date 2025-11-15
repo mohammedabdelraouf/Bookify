@@ -14,6 +14,7 @@ const RoomDetails = () => {
     const [reviews, setReviews] = useState([]);
     const [checkInDate, setCheckInDate] = useState('');
     const [checkOutDate, setCheckOutDate] = useState('');
+    const [isBooking, setIsBooking] = useState(false);
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
@@ -84,8 +85,32 @@ const RoomDetails = () => {
         checkOutDate: checkOutDate
       };
 
-      // API call in next task
-      console.log('Booking data prepared:', bookingData);
+      setIsBooking(true);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/bookings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bookingData)
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Booking failed');
+        }
+
+        const result = await response.json();
+        // Handle success in next task
+        console.log('Booking created:', result);
+
+      } catch (error) {
+        alert('Booking failed: ' + error.message);
+      } finally {
+        setIsBooking(false);
+      }
     };
 
   if (!roomData) {
@@ -226,8 +251,11 @@ const RoomDetails = () => {
         </div>
       </div>
       <div className='flex flex-col w-full md:w-1/4 justify-center align-items-center my-5'>
-       <button className='bg-green-400 p-2 w-8/12 rounded text-white font-bold hover:bg-green-500 transition-colors'>
-            Book Now
+       <button
+         disabled={isBooking}
+         className='bg-green-400 p-2 w-8/12 rounded text-white font-bold hover:bg-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed'
+       >
+            {isBooking ? 'Booking...' : 'Book Now'}
         </button>
       </div>
     </form>
