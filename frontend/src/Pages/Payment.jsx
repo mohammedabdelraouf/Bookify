@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../Context/AppContext.jsx'
 import assets from '../assets/assets.js'
 import Title from '../Components/Title.jsx'
 
@@ -14,10 +15,34 @@ const Payment = () => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchBookingDetails = async () => {
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/bookings/${bookingId}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            if (!response.ok) throw new Error('Failed to fetch booking');
+
+            const data = await response.json();
+            setBooking(data);
+        } catch (error) {
+            alert('Error loading booking: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (!bookingId) {
             alert('No booking found');
             navigate('/rooms');
+        } else {
+            fetchBookingDetails();
         }
     }, [bookingId, navigate]);
 
