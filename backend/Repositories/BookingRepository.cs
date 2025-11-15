@@ -77,6 +77,36 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
+        {
+            return await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Room).ThenInclude(r => r.RoomType)
+                .Include(b => b.Payment)
+                .Include(b => b.Review)
+                .Select(b => new BookingDto
+                {
+                    //booking props
+                    BookingId = b.BookingId,
+                    CheckInDate = b.CheckInDate,
+                    CheckOutDate = b.CheckOutDate,
+                    BookingDate = b.BookingDate,
+                    TotalCost = b.TotalAmount,
+                    Status = b.bookingStatus.ToString(),
+                    //room props
+                    RoomNumber = b.Room.RoomNumber,
+                    Floor = b.Room.Floor,
+                    RoomTypeName = b.Room.RoomType.Name,
+                    // Payment props
+                    PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
+                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    // Review status
+                    HasReview = b.Review != null
+                })
+                .OrderByDescending(b => b.BookingDate)
+                .ToListAsync();
+        }
+
         public Task<BookingDto> GetBookingByIdAsync(int bookingId, string userId)
         {
             var booking = _context.Bookings

@@ -14,12 +14,14 @@ namespace backend.Controllers
         private readonly IRoomRepository _roomRepository;
         private readonly IRoomTypeRepository _roomTypeRepository;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IBookingRepository _bookingRepository;
         public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository,
-            ICloudinaryService cloudinaryService)
+            ICloudinaryService cloudinaryService, IBookingRepository bookingRepository)
         {
             _roomTypeRepository = roomTypeRepository;
             _roomRepository = roomRepository;
             _cloudinaryService = cloudinaryService;
+            _bookingRepository = bookingRepository;
         }
         [HttpPost("room-types")] // POST: api/Admin/room-types
         public async Task<IActionResult> AddRoomType([FromBody] CreateRoomTypeDto createRoomTypeDto)
@@ -195,6 +197,14 @@ namespace backend.Controllers
             if (!ok) return StatusCode(500, "Failed to delete image.");
 
             return Ok(new { Message = "Image deleted." });
+        }
+
+        // Bookings methods
+        [HttpGet("bookings")]
+        public async Task<IActionResult> GetAllBookings()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            return Ok(bookings);
         }
 
     }
