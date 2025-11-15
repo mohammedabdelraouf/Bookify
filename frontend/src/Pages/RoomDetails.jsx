@@ -40,6 +40,31 @@ const RoomDetails = () => {
       fetchRoomData();
       fetchReviews();
     }, [RoomId, rooms])
+
+    const validateBookingDates = () => {
+      if (!checkInDate || !checkOutDate) {
+        alert('Please select check-in and check-out dates');
+        return false;
+      }
+
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (checkIn < today) {
+        alert('Check-in date cannot be in the past');
+        return false;
+      }
+
+      if (checkOut <= checkIn) {
+        alert('Check-out date must be after check-in date');
+        return false;
+      }
+
+      return true;
+    };
+
   if (!roomData) {
     return (
       <div className='flex justify-center items-center min-h-screen'>
@@ -147,7 +172,12 @@ const RoomDetails = () => {
       </div>
     </section>
     {/*choose time for booking section*/}
-    <form onSubmit={(e) => { e.preventDefault(); navigate(`/rooms/${RoomId}/payment`); }}
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      if (validateBookingDates()) {
+        navigate(`/rooms/${RoomId}/payment`);
+      }
+    }}
  className='w-[80%] mx-auto my-10 bg-[rgba(10,10,10,0.2)] p-5 rounded-2xl'>
       <h3 className='text-xl font-bold mb-4'>Book This Room</h3>
       <div className='flex flex-col md:flex-row gap-4'>
