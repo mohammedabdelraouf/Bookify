@@ -15,6 +15,9 @@ const RoomDetails = () => {
     const [checkInDate, setCheckInDate] = useState('');
     const [checkOutDate, setCheckOutDate] = useState('');
     const [isBooking, setIsBooking] = useState(false);
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState('');
+    const [showReviewForm, setShowReviewForm] = useState(false);
     const navigate = useNavigate();
 
     const fetchRoomData = async () => {
@@ -234,6 +237,64 @@ const RoomDetails = () => {
           <p className='text-gray-500'>No reviews yet. Be the first to review this room!</p>
         )}
       </div>
+
+      {/* Write Review Button */}
+      {!showReviewForm && (
+        <button
+          onClick={() => setShowReviewForm(true)}
+          className='mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors'
+        >
+          Write a Review
+        </button>
+      )}
+
+      {/* Review Form */}
+      {showReviewForm && (
+        <div className='mt-8 border rounded-lg p-6 bg-white shadow-md'>
+          <h3 className='text-xl font-bold mb-4'>Write a Review</h3>
+
+          <div className='mb-4'>
+            <label className='block mb-2 font-semibold'>Rating</label>
+            <select
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              className='w-full p-2 border rounded'
+            >
+              <option value="5">5 Stars - Excellent</option>
+              <option value="4">4 Stars - Very Good</option>
+              <option value="3">3 Stars - Good</option>
+              <option value="2">2 Stars - Fair</option>
+              <option value="1">1 Star - Poor</option>
+            </select>
+          </div>
+
+          <div className='mb-4'>
+            <label className='block mb-2 font-semibold'>Comment</label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder='Share your experience...'
+              rows='4'
+              className='w-full p-2 border rounded'
+            />
+          </div>
+
+          <div className='flex gap-4'>
+            <button
+              onClick={() => {/* handleSubmitReview in next task */}}
+              className='bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors'
+            >
+              Submit Review
+            </button>
+            <button
+              onClick={() => setShowReviewForm(false)}
+              className='bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 transition-colors'
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </section>
     {/*choose time for booking section*/}
     <form onSubmit={(e) => {
