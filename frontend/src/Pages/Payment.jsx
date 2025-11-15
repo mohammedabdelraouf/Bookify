@@ -1,10 +1,26 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import assets from '../assets/assets.js'
 import Title from '../Components/Title.jsx'
 
 const Payment = () => {
-    const [payMethod , setPayMethod] = useState('cash');
+    const { RoomId } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { bookingId, roomNumber, checkInDate, checkOutDate, totalAmount } = location.state || {};
+
+    const [payMethod, setPayMethod] = useState('cash');
+    const [booking, setBooking] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!bookingId) {
+            alert('No booking found');
+            navigate('/rooms');
+        }
+    }, [bookingId, navigate]);
+
     const handlePayment = (event) => {
         event.preventDefault();
         const paymentData = {
