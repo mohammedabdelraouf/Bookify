@@ -11,6 +11,7 @@
         {
             return await _context.Rooms.
                  Include(R => R.RoomType) //eager loading to avoid null values for RoomType properties
+                 .Include(R => R.RoomImages) //eager loading to include room images
                  .Select(r => new RoomDto { // converting the entity to dto so the front end can handle them
                      roomId = r.RoomId,
                      roomNumber = r.RoomNumber,
@@ -19,7 +20,13 @@
                      roomTypeName = r.RoomType.Name,
                      roomTypeDescription = r.RoomType.Description,
                      roomTypeCapacity = r.RoomType.Capacity,
-                     roomTypePricePerNight = r.RoomType.PricePerNight
+                     roomTypePricePerNight = r.RoomType.PricePerNight,
+                     Images = r.RoomImages.Select(img => new RoomImageDto
+                     {
+                         ImageId = img.ImageId,
+                         Url = img.ImageUrl,
+                         IsMain = img.IsMain
+                     }).ToList()
                  }).ToListAsync();
         }
         public async Task<RoomDto?> GetRoomDtoByIdAsync(int roomId)

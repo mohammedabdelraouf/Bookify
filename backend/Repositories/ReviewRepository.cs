@@ -20,6 +20,10 @@ namespace backend.Repositories
             {
                 throw new InvalidOperationException("Cannot review a booking that is not confirmed.");
             }
+            if(booking.CheckOutDate > DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Cannot review a booking that hasn't been completed yet.");
+            }
             var existingReview = await _context.Reviews
                                      .FirstOrDefaultAsync(r => r.BookingId == reviewDto.BookingId);
             if (existingReview != null)

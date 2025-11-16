@@ -40,6 +40,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 //---------------------------------------------------------------------------
+
+// Add CORS policy to allow frontend (React) to access the API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();// this line is for directing the request to controllers
 builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpenApi
 builder.Services.AddSwaggerGen(options =>
@@ -86,6 +99,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Create roles
     string[] roles = { "Admin", "Customer"};
     foreach (var role in roles)
     {
@@ -95,8 +111,42 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
+
+    // Create default admin user
+    var adminEmail = "admin@bookify.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        var newAdmin = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FirstName = "Admin",
+            LastName = "User",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(newAdmin, "Admin@123");
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin, "Admin");
+            Console.WriteLine("Default admin user created successfully!");
+            Console.WriteLine($"Email: {adminEmail}");
+            Console.WriteLine("Password: Admin@123");
+        }
+    }
 }
 
+// Seed database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<BookifyDbContext>();
+    var seeder = new DatabaseSeeder(context);
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -105,7 +155,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(); // <-- بيعمل صفحة الـ UI لـ Swagger
 }
 // this middleware to redirect http request to https
-app.UseHttpsRedirection();
+// Commented out for development to avoid CORS preflight redirect issues
+// app.UseHttpsRedirection();
+
+// Use CORS policy (must come before Authentication and Authorization)
+app.UseCors("AllowReactApp");
 
 // --- 6. إضافة الـ Authentication (مهم جداً!) ---
 app.UseAuthentication(); // <-- لازم ييجي قبل الـ Authorization // لان اصلا الطبيعي انا بشوف انت مسموح تسنخدم السيستم ولا لا

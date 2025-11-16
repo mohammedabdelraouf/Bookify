@@ -40,7 +40,8 @@ namespace backend.Controllers
             {
                 Email = user.Email,
                 FirstName = user.FirstName,
-                Token = token
+                Token = token,
+                Roles = roles.ToList()
             };
             return Ok(LoginResponse);
         }
@@ -66,12 +67,14 @@ namespace backend.Controllers
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
             }
+            await _userManager.AddToRoleAsync(newUser, "Customer");
             var token = _tokenService.CreateToken(newUser, new List<string>() { "Customer"});
             var loginResponse = new LoginResponseDto
             {
                 Email = newUser.Email,
                 FirstName = newUser.FirstName,
-                Token = token
+                Token = token,
+                Roles = new List<string>() { "Customer" }
             };
             return Ok(loginResponse);
         }

@@ -20,7 +20,7 @@
         // relationship with the book one to one
         [Required]
         public int BookingId { get; set; }
-        [ForeignKey("BookId")]
+        [ForeignKey("BookingId")]
         public Booking Booking { get; set; } // one booking to one review
     }
 }

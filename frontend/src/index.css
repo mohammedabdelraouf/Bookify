@@ -9,3 +9,27 @@
 a.active hr{
     display: block;
 }
+
+/* Fix image gallery to fill container */
+.image-gallery-slide img {
+    width: 100% !important;
+    height: 600px !important;
+    object-fit: cover !important;
+}
+
+.image-gallery {
+    width: 100%;
+    height: 100%;
+}
+
+.image-gallery-content {
+    height: 100%;
+}
+
+.image-gallery-slide-wrapper {
+    height: 100%;
+}
+
+.image-gallery-swipe {
+    height: 100%;
+}
