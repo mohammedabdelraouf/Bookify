@@ -15,7 +15,7 @@ const  Rooms = () => {
   const { rooms, isLoading } = RoomsData;
 
   const [sortBy, setSortBy] = useState('price-asc');
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+  const [viewMode, setViewMode] = useState('grid'); // 'list' or 'grid'
 
   // Reset all filters
   const resetFilters = () => {
