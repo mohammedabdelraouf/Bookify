@@ -20,6 +20,19 @@ namespace backend.Repositories
             var numberOfNights = (createBookingDto.CheckOut - createBookingDto.CheckIn).Days;
             if (numberOfNights <= 0)
             { throw new Exception("Check-out date must be after check-in date"); }
+
+            // Check if room is already booked for the requested dates
+            var hasConflict = await _context.Bookings
+                .AnyAsync(b => b.RoomId == createBookingDto.RoomId
+                    && (b.bookingStatus == BookingStatus.Confirmed || b.bookingStatus == BookingStatus.Pending)
+                    && b.CheckInDate < createBookingDto.CheckOut
+                    && b.CheckOutDate > createBookingDto.CheckIn);
+
+            if (hasConflict)
+            {
+                throw new InvalidOperationException("This room is already booked for the selected dates. Please choose different dates or another room.");
+            }
+
             var TotalAmount = pricePerNight * numberOfNights;
             var newBooking = new Booking
             {
@@ -38,7 +51,9 @@ namespace backend.Repositories
         public async Task<IEnumerable<BookingDto>> GetUserBookingsAsync(string userId)
         {
             return await _context.Bookings.Where(b => b.UserId == userId)
-                .Include(b => b.Room).ThenInclude(r => r.RoomType).Include(b => b.Payment)
+                .Include(b => b.Room).ThenInclude(r => r.RoomType)
+                .Include(b => b.Payment)
+                .Include(b => b.Review)
                 .Select(b => new BookingDto
                 {
                     //booking props
@@ -53,10 +68,52 @@ namespace backend.Repositories
                     Floor = b.Room.Floor,
                     RoomTypeName = b.Room.RoomType.Name,
                     // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
                     PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
-                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A"
+                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
+                    // Review status
+                    HasReview = b.Review != null
 
                 })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
+        {
+            return await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Room).ThenInclude(r => r.RoomType)
+                .Include(b => b.Payment)
+                .Include(b => b.Review)
+                .Select(b => new BookingDto
+                {
+                    //booking props
+                    BookingId = b.BookingId,
+                    CheckInDate = b.CheckInDate,
+                    CheckOutDate = b.CheckOutDate,
+                    BookingDate = b.BookingDate,
+                    TotalCost = b.TotalAmount,
+                    Status = b.bookingStatus.ToString(),
+                    // User props (for admin)
+                    UserEmail = b.User.Email,
+                    UserFirstName = b.User.FirstName,
+                    UserLastName = b.User.LastName,
+                    //room props
+                    RoomNumber = b.Room.RoomNumber,
+                    Floor = b.Room.Floor,
+                    RoomTypeName = b.Room.RoomType.Name,
+                    // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
+                    PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
+                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
+                    // Review status
+                    HasReview = b.Review != null
+                })
+                .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
         }
 
@@ -66,6 +123,7 @@ namespace backend.Repositories
                 .Where(b => b.BookingId == bookingId && b.UserId == userId)
                 .Include(b => b.Room).ThenInclude(r => r.RoomType)
                 .Include(b => b.Payment)
+                .Include(b => b.Review)
                 .Select(b => new BookingDto
                 {
                     //booking props
@@ -80,8 +138,13 @@ namespace backend.Repositories
                     Floor = b.Room.Floor,
                     RoomTypeName = b.Room.RoomType.Name,
                     // Payment props
+                    PaymentId = b.Payment != null ? b.Payment.PaymentId : null,
                     PaymentMethod = b.Payment != null ? b.Payment.Method.ToString() : "N/A",
-                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A"
+                    PaymentStatus = b.Payment != null ? b.Payment.Status.ToString() : "N/A",
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    TransactionId = b.Payment != null ? b.Payment.TransactionId : null,
+                    // Review status
+                    HasReview = b.Review != null
                 })
                 .FirstOrDefaultAsync();
             return booking;
