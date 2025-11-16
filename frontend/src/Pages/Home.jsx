@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import assets from '../assets/assets.js'
 import ReactImageGallery from 'react-image-gallery'
 import "react-image-gallery/styles/css/image-gallery.css";
 import { API_BASE_URL } from '../Context/AppContext.jsx'
@@ -29,10 +28,10 @@ const Home = () => {
   }
 
   const galleryItems = [
-    { original: assets.room1 },
-    { original: assets.room2 },
-    { original: assets.room3 },
-    { original: assets.room4 }
+    { original: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop' },
+    { original: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop' },
+    { original: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=2074&auto=format&fit=crop' },
+    { original: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop' }
   ]
 
   return (

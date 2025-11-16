@@ -155,7 +155,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(); // <-- بيعمل صفحة الـ UI لـ Swagger
 }
 // this middleware to redirect http request to https
-app.UseHttpsRedirection();
+// Commented out for development to avoid CORS preflight redirect issues
+// app.UseHttpsRedirection();
 
 // Use CORS policy (must come before Authentication and Authorization)
 app.UseCors("AllowReactApp");

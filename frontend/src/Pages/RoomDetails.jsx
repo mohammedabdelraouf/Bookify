@@ -146,7 +146,7 @@ const RoomDetails = () => {
             roomNumber: roomData.number,
             checkInDate,
             checkOutDate,
-            totalAmount: result.totalAmount
+            totalAmount: result.totalCost
           }
         });
 
