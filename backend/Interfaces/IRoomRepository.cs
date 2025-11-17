@@ -8,6 +8,7 @@
         Task<RoomDto?> GetRoomDtoByIdAsync(int roomId);
         // Admin Methods
         Task<Room> GetRoomEntityByIdAsync(int roomId);
+
         Task AddRoomAsync(Room room); // parameter is RoomDto to avoid overposting and because front-end only sends these properties
         Task UpdateRoomAsync(int id,UpdateRoomDto UpdateRoom);
         Task<bool> DeleteRoomAsync(int roomId);

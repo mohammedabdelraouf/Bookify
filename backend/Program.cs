@@ -11,14 +11,22 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddDbContext<BookifyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+
 //bind the cloudinary settings from appsettings.json
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(CloudinarySettings.SectionName));
+
+
+// bind the admin settings from appsettings.json
+
+builder.Services.Configure<AdminSettings>(
+    builder.Configuration.GetSection(AdminSettings.SectionName));
+
+
 // bind the JWT settings from appsettings.json
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection(JWTSettings.SectionName));
 var jwtSettings = new JWTSettings();
 builder.Configuration.GetSection(JWTSettings.SectionName).Bind(jwtSettings);
-//--- الجزء ده لسا هذاكره --------------------------------------------------
-// --- 3. إعداد الـ Authentication والـ JWT (لـ React) ---
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,7 +80,18 @@ options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecu
         }
     });
 });
-
+// to enable CORS policy for the frontend application
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>(); 
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
@@ -81,31 +100,107 @@ builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 var app = builder.Build();
 
-// adding the rules of the user
+// adding the rules of the user manually 
 
+//using (var scope = app.Services.CreateScope())
+//{
+//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//    string[] roles = { "Admin", "Customer"};
+//    foreach (var role in roles)
+//    {
+//        var roleExist = await roleManager.RoleExistsAsync(role);
+//        if (!roleExist)
+//        {
+//            await roleManager.CreateAsync(new IdentityRole(role));
+//        }
+//    }
+//}
+
+// seeding default admin user 
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Admin", "Customer"};
+    var Services = scope.ServiceProvider;
+    var userManager = Services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = Services.GetRequiredService<RoleManager<IdentityRole>>();
+    var adminSettings = Services.GetRequiredService<IOptions<AdminSettings>>().Value;
+    var logger = Services.GetRequiredService<ILogger<Program>>();
+
+    //create roles
+    string[] roles = { "Admin", "Customer" };
     foreach (var role in roles)
     {
         var roleExist = await roleManager.RoleExistsAsync(role);
         if (!roleExist)
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+           var result = await roleManager.CreateAsync(new IdentityRole(role));
+            if (result.Succeeded)
+              {
+                logger.LogInformation($"Role '{role}' created successfully.");
+              }
+              else
+              {
+                logger.LogError($"Error creating role '{role}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
         }
     }
+    //create default admin credentials
+    if(!string.IsNullOrEmpty(adminSettings.Email) && !string.IsNullOrEmpty(adminSettings.Password))
+    {
+        var adminEmail = adminSettings.Email;
+        var adminPassword = adminSettings.Password;
+        var adminUser = await userManager.FindByEmailAsync(adminSettings.Email);
+        if (adminUser == null)
+        {
+            var newAdminUser = new ApplicationUser
+            {
+                UserName = adminSettings.Email,
+                Email = adminSettings.Email,
+                EmailConfirmed = true
+            };
+            var createAdminResult = await userManager.CreateAsync(newAdminUser, adminSettings.Password);
+            if (createAdminResult.Succeeded)
+            {
+                await userManager.AddToRoleAsync(newAdminUser, "Admin");
+                logger.LogInformation("Default admin user created successfully.");
+            }
+            else
+            {
+                logger.LogError($"Error creating default admin user: {string.Join(", ", createAdminResult.Errors.Select(e => e.Description))}");
+            }
+
+        }
+        else
+        {
+            if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+                logger.LogInformation("Existing user assigned to Admin role.", adminEmail);
+            }
+        }
+    }
+
 }
+
+
+
+
+
 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger(); // <-- بيشغل Swagger
-    app.UseSwaggerUI(); // <-- بيعمل صفحة الـ UI لـ Swagger
-}
+    {
+        app.UseSwagger(); // <-- بيشغل Swagger
+        app.UseSwaggerUI(); // <-- بيعمل صفحة الـ UI لـ Swagger
+    }
 // this middleware to redirect http request to https
 app.UseHttpsRedirection();
+
+// ensure routing is set up (explicit; optional in minimal apps but recommended)
+app.UseRouting();
+
+// this middleware to use the CORS policy
+app.UseCors("AllowFrontend");
 
 // --- 6. إضافة الـ Authentication (مهم جداً!) ---
 app.UseAuthentication(); // <-- لازم ييجي قبل الـ Authorization // لان اصلا الطبيعي انا بشوف انت مسموح تسنخدم السيستم ولا لا

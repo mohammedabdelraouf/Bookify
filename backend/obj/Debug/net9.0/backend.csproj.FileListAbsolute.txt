@@ -515,7 +515,6 @@ C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.build.json
 C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.development.json
 C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\depi-gp\backend\obj\Debug\net9.0\backend.csproj.Up2Date
 C:\depi-gp\backend\obj\Debug\net9.0\backend.dll
 C:\depi-gp\backend\obj\Debug\net9.0\refint\backend.dll
@@ -524,3 +523,4 @@ C:\depi-gp\backend\obj\Debug\net9.0\backend.genruntimeconfig.cache
 C:\depi-gp\backend\obj\Debug\net9.0\ref\backend.dll
 C:\depi-gp\backend\bin\Debug\net9.0\CloudinaryDotNet.dll
 C:\depi-gp\backend\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\depi-gp\backend\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
