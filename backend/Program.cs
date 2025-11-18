@@ -155,7 +155,9 @@ using (var scope = app.Services.CreateScope())
             {
                 UserName = adminSettings.Email,
                 Email = adminSettings.Email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                FirstName="Admin",
+                LastName = "test"
             };
             var createAdminResult = await userManager.CreateAsync(newAdminUser, adminSettings.Password);
             if (createAdminResult.Succeeded)

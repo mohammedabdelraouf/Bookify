@@ -14,12 +14,19 @@ namespace backend.Controllers
         private readonly IRoomRepository _roomRepository;
         private readonly IRoomTypeRepository _roomTypeRepository;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<AdminController> _logger;
         public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository,
-            ICloudinaryService cloudinaryService)
+            ICloudinaryService cloudinaryService, UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager, ILogger<AdminController> logger)
         {
             _roomTypeRepository = roomTypeRepository;
             _roomRepository = roomRepository;
             _cloudinaryService = cloudinaryService;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _logger = logger;
         }
         [HttpPost("room-types")] // POST: api/Admin/room-types
         public async Task<IActionResult> AddRoomType([FromBody] CreateRoomTypeDto createRoomTypeDto)
@@ -38,7 +45,7 @@ namespace backend.Controllers
             return Ok(roomTypes);
 
         }
-        [HttpGet("room-types/{id}")]    
+        [HttpGet("room-types/{id}")]
         public async Task<IActionResult> GetRoomTypeById(int id)
         {
             var roomType = await _roomTypeRepository.GetRoomTypeDtoByIdAsync(id);
@@ -55,7 +62,7 @@ namespace backend.Controllers
             {
                 return BadRequest(ModelState);
             }
- 
+
             await _roomTypeRepository.UpdateRoomTypeAsync(id, createRoomTypeDto);
             return Ok(new { Message = "Room type updated successfully." });
         }
@@ -73,12 +80,12 @@ namespace backend.Controllers
         [HttpPost("rooms")]
         public async Task<IActionResult> AddRoom([FromBody] CreateRoomDto roomDto)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var roomType = await _roomTypeRepository.GetRoomEntityByIdAsync(roomDto.RoomTypeId);
-            if(roomType == null)
+            if (roomType == null)
             {
                 return BadRequest(new { Message = "Invalid RoomTypeId. Room type does not exist." });
             }
@@ -100,7 +107,7 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
             }
             var roomType = await _roomTypeRepository.GetRoomEntityByIdAsync(updateRoomDto.RoomTypeId);
-            if(roomType == null)
+            if (roomType == null)
             {
                 return BadRequest(new { Message = "Invalid RoomTypeId. Room type does not exist." });
             }
@@ -197,5 +204,53 @@ namespace backend.Controllers
             return Ok(new { Message = "Image deleted." });
         }
 
+        //------------------------------admin user management-------------------------------
+
+        [HttpGet("users-with-roles")]
+        public async Task<IActionResult> GetUsersWithRoles()
+        {
+            var users = _userManager.Users.ToList();
+            var results = new List<UserWithRolesDto>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                results.Add(new UserWithRolesDto
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName,
+                    Roles = roles
+                });
+            }
+            return Ok(results);
+        }
+
+        [HttpPost("users/promote")]
+        public async Task<IActionResult> PromoteToAdmin([FromBody] PromoteUserDto userDto)
+        {
+
+            if (string.IsNullOrEmpty(userDto.Email))
+                return BadRequest(new { Message = "Email is required." });
+
+            var user = await _userManager.FindByEmailAsync(userDto.Email);
+            if (user == null)
+                return NotFound(new { Message = "User not found." });
+
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+                return StatusCode(500, new { Message = "Admin role does not exist." });
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+                return BadRequest(new { Message = "User is already an Admin." });
+
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Failed to promote user {UserId} to Admin: {Errors}", userDto.Email,
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+                return StatusCode(500, new { Message = "Failed to promote user to Admin.", Errors = result.Errors });
+            }
+            _logger.LogInformation("User {Email} promoted to Admin by {By}", userDto.Email, User?.Identity?.Name ?? "system");
+            return Ok(new { Message = "User promoted to Admin successfully." });
+        }
     }
 }
