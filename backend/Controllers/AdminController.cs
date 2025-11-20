@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using backend.Dtos.AccountDtos;
+using backend.Dtos.RoomDtos;
+using backend.Dtos.RoomImageDtos;
+using backend.Dtos.RoomTypeDtos;
+using backend.RepositoryPattern.Interfaces;
+using backend.Services.CloudinaryService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -252,5 +258,37 @@ namespace backend.Controllers
             _logger.LogInformation("User {Email} promoted to Admin by {By}", userDto.Email, User?.Identity?.Name ?? "system");
             return Ok(new { Message = "User promoted to Admin successfully." });
         }
+
+        [HttpPost("users/demote")]
+        public async Task<IActionResult> DemoteFromAdmin([FromBody] PromoteUserDto userDto)
+        { 
+            if(string.IsNullOrEmpty(userDto.Email))
+                return BadRequest(new{ Message = "Email is required." });
+            var user = await _userManager.FindByEmailAsync(userDto.Email);
+            if(user == null)
+                return NotFound(new{ Message = "User not found." });
+            if(!await _roleManager.RoleExistsAsync("Admin"))
+                return BadRequest(new { Message = "User is not an Admin." });
+            // Prevent self-demotion
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(user.Id == currentUserId)
+                return BadRequest(new { Message = "You cannot demote yourself." });
+            // prevent removing the last admin
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            if(admins.Count <= 1)
+                return BadRequest(new { Message = "Cannot demote the last remaining Admin." });
+
+            var result = await _userManager.RemoveFromRoleAsync(user, "Admin");
+            if(!result.Succeeded)
+            {
+                _logger.LogWarning("Failed to demote user {UserId} from Admin: {Errors}", userDto.Email,
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+                return StatusCode(500, new { Message = "Failed to demote user from Admin.", Errors = result.Errors });
+            }
+            _logger.LogInformation("User {Email} demoted from Admin by {By}", userDto.Email, User?.Identity?.Name ?? "system");
+            return Ok(new { Message = "User demoted from Admin successfully." });
+
+        }
+
     }
 }

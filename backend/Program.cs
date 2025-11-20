@@ -1,5 +1,10 @@
 ﻿
 
+using backend.RepositoryPattern.Interfaces;
+using backend.RepositoryPattern.Repositories;
+using backend.Services.CloudinaryService;
+using backend.Services.TokenService;
+
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 

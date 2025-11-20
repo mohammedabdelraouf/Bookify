@@ -1,4 +1,6 @@
-﻿namespace backend.Models
+﻿using backend.Models.Enums;
+
+namespace backend.Models
 {
     public class Payment
     {

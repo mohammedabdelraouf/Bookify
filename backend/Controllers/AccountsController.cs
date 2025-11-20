@@ -1,13 +1,8 @@
-﻿using backend.Dtos;
-using backend.Interfaces;
-using backend.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
+﻿
 namespace backend.Controllers
 {
     // this controller will receive the registers and login requests
-    [Controller]
+    [ApiController]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
     {
@@ -50,9 +45,11 @@ namespace backend.Controllers
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var userExists = await _userManager.FindByEmailAsync(registerDto.Email);
             if(userExists != null)
                 return BadRequest("Email is already registered");
+
             var newUser = new ApplicationUser
             {
                 Email = registerDto.Email,
@@ -60,13 +57,22 @@ namespace backend.Controllers
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName
             };
+
             var result = await _userManager.CreateAsync(newUser, registerDto.Password);
             if(!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
             }
-            var token = _tokenService.CreateToken(newUser, new List<string>() { "Customer"});
+            var roleExists = await _userManager.IsInRoleAsync(newUser, "Customer"); //expected to be false
+            var addRoleResult = await _userManager.AddToRoleAsync(newUser, "Customer");
+            if(!addRoleResult.Succeeded)
+            {
+                var errors = addRoleResult.Errors.Select(e => e.Description);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to assign default role.", Errors = errors });
+            }
+            var roles = await _userManager.GetRolesAsync(newUser);
+            var token = _tokenService.CreateToken(newUser, roles.ToList());
             var loginResponse = new LoginResponseDto
             {
                 Email = newUser.Email,

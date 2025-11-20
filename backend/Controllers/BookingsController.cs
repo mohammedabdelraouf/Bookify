@@ -1,4 +1,8 @@
 ﻿
+using backend.Dtos.BookingDtos;
+using backend.Dtos.PaymentDtos;
+using backend.RepositoryPattern.Interfaces;
+
 namespace backend.Controllers
 {
     [ApiController]

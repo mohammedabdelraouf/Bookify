@@ -1,4 +1,6 @@
-﻿namespace backend.Controllers
+﻿using backend.RepositoryPattern.Interfaces;
+
+namespace backend.Controllers
 {
     [ApiController] // add features like understanding request body, model validation, etc [formbody]
     [Route("api/[controller]")]
