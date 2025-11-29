@@ -25,9 +25,8 @@ const RoomCard = ({roomImg, roomData}) => {
             Book Now
       </button>
       </div>
-      
     </div>
-  )
+  );
 }
 
 export default RoomCard

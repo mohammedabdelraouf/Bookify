@@ -35,7 +35,8 @@ namespace backend.Controllers
             {
                 Email = user.Email,
                 FirstName = user.FirstName,
-                Token = token
+                Token = token,
+                Roles = roles.ToList()
             };
             return Ok(LoginResponse);
         }
@@ -64,6 +65,7 @@ namespace backend.Controllers
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
             }
+<<<<<<< HEAD
             var roleExists = await _userManager.IsInRoleAsync(newUser, "Customer"); //expected to be false
             var addRoleResult = await _userManager.AddToRoleAsync(newUser, "Customer");
             if(!addRoleResult.Succeeded)
@@ -73,11 +75,16 @@ namespace backend.Controllers
             }
             var roles = await _userManager.GetRolesAsync(newUser);
             var token = _tokenService.CreateToken(newUser, roles.ToList());
+=======
+            await _userManager.AddToRoleAsync(newUser, "Customer");
+            var token = _tokenService.CreateToken(newUser, new List<string>() { "Customer"});
+>>>>>>> complete-booking-system
             var loginResponse = new LoginResponseDto
             {
                 Email = newUser.Email,
                 FirstName = newUser.FirstName,
-                Token = token
+                Token = token,
+                Roles = new List<string>() { "Customer" }
             };
             return Ok(loginResponse);
         }

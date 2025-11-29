@@ -20,19 +20,29 @@ namespace backend.Controllers
         private readonly IRoomRepository _roomRepository;
         private readonly IRoomTypeRepository _roomTypeRepository;
         private readonly ICloudinaryService _cloudinaryService;
+<<<<<<< HEAD
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AdminController> _logger;
         public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository,
             ICloudinaryService cloudinaryService, UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager, ILogger<AdminController> logger)
+=======
+        private readonly IBookingRepository _bookingRepository;
+        public AdminController(IRoomTypeRepository roomTypeRepository, IRoomRepository roomRepository,
+            ICloudinaryService cloudinaryService, IBookingRepository bookingRepository)
+>>>>>>> complete-booking-system
         {
             _roomTypeRepository = roomTypeRepository;
             _roomRepository = roomRepository;
             _cloudinaryService = cloudinaryService;
+<<<<<<< HEAD
             _userManager = userManager;
             _roleManager = roleManager;
             _logger = logger;
+=======
+            _bookingRepository = bookingRepository;
+>>>>>>> complete-booking-system
         }
         [HttpPost("room-types")] // POST: api/Admin/room-types
         public async Task<IActionResult> AddRoomType([FromBody] CreateRoomTypeDto createRoomTypeDto)
@@ -210,6 +220,7 @@ namespace backend.Controllers
             return Ok(new { Message = "Image deleted." });
         }
 
+<<<<<<< HEAD
         //------------------------------admin user management-------------------------------
 
         [HttpGet("users-with-roles")]
@@ -288,6 +299,36 @@ namespace backend.Controllers
             _logger.LogInformation("User {Email} demoted from Admin by {By}", userDto.Email, User?.Identity?.Name ?? "system");
             return Ok(new { Message = "User demoted from Admin successfully." });
 
+=======
+        // Bookings methods
+        [HttpGet("bookings")]
+        public async Task<IActionResult> GetAllBookings()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            return Ok(bookings);
+        }
+
+        // Payments methods
+        [HttpGet("payments")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            // Filter to only include bookings with actual payments
+            var paymentsData = bookings
+                .Where(b => b.PaymentId.HasValue)
+                .OrderByDescending(b => b.PaymentDate)
+                .ToList();
+            return Ok(paymentsData);
+        }
+
+        // Customers methods
+        [HttpGet("customers")]
+        public async Task<IActionResult> GetAllCustomers()
+        {
+            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            // Return all bookings with user info - frontend will group by user
+            return Ok(bookings);
+>>>>>>> complete-booking-system
         }
 
     }

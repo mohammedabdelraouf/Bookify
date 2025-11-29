@@ -1,35 +1,18 @@
-import React from 'react'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { AppContext } from '../Context/AppContext'
-import RoomCard from '../Components/RoomCard';
-import assets from '../assets/assets';
+import RoomCard from '../Components/RoomCard'
 
 const  Rooms = () => {
   const RoomsData = useContext(AppContext);
   const [filter, setFilter] = useState({
-    price: [0, 1000],
+    price: [0, 500],
     type: 'all',
     capacity: 1
   });
- 
- const[filteredRooms, setFilteredRooms] = useState([]);
 
-  // useEffect(() => {
-  //   let rooms = RoomsData;
-  //     // Apply price filter
-  //     rooms = rooms.filter(room => room.price >= filter.price[0] && room.price <= filter.price[1]);
-  //   // Apply type filter
-  //     rooms = rooms.filter(room => room.type === filter.type);
-  //   // Apply capacity filter
-  //     rooms = rooms.filter(room => room.capacity >= filter.capacity);
-  //     setFilteredRooms(rooms);}, [filter, RoomsData]);
-
-
-  const{rooms} = {
-    rooms: [1,2,3,4]
-  }
-  const images = [assets.room1, assets.room2, assets.room3, assets.room4, assets.room5];
+  // Get actual rooms from AppContext
+  const { rooms, isLoading } = RoomsData;
 
   const [sortBy, setSortBy] = useState('price-asc');
 
@@ -54,7 +37,7 @@ const  Rooms = () => {
             <select 
               value={filter.type} 
               onChange={(e) => setFilter({...filter, type: e.target.value})}
-              className='w-full p-2 border rounded'
+              className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent'
             >
               <option value="all">All</option>
               <option value="single">Single</option>
@@ -63,12 +46,13 @@ const  Rooms = () => {
             </select>
           </div>
 
+          {/* Sort By */}
           <div>
-            <h3 className='font-bold mb-2'>Sort By</h3>
-            <select 
-              value={sortBy} 
+            <h3 className='font-bold text-gray-700 mb-3'>Sort By</h3>
+            <select
+              value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className='w-full p-2 border rounded '
+              className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent'
             >
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>

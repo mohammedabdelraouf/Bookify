@@ -109,7 +109,7 @@ namespace backend.Controllers
             try
             {
                 await _bookingRepository.ConfirmPaymentAsync(paymentConfirmationDto.BookingId, userId, paymentConfirmationDto.TransactionId);
-                return Ok("payment is confirmed and booking is updated successfully");
+                return Ok(new { message = "payment is confirmed and booking is updated successfully" });
             }
             catch (KeyNotFoundException ex) // for no booking exception
             {

@@ -53,6 +53,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 //---------------------------------------------------------------------------
+
+// Add CORS policy to allow frontend (React) to access the API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();// this line is for directing the request to controllers
 builder.Services.AddEndpointsApiExplorer(); // <-- بديل/أفضل من AddOpenApi
 builder.Services.AddSwaggerGen(options =>

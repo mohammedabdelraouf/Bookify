@@ -1,0 +1,79 @@
+# Specifies the Docker Compose file format version
+# Version 3.8 is a modern, stable version that supports all the features we need
+version: '3.8'
+
+# Defines all the containers (applications) you want to run
+services:
+  # Names this service "sqlserver" - used to reference this container
+  sqlserver:
+    # Docker image to use: Microsoft's official SQL Server 2022 image
+    # Docker will download this image if you don't have it locally
+    image: mcr.microsoft.com/mssql/server:2022-latest
+
+    # Custom name for the running container (instead of auto-generated name)
+    # Makes it easier to identify and manage
+    container_name: bookify-sqlserver
+
+    # Environment variables - configuration settings passed to SQL Server
+    environment:
+      # Accepts Microsoft's End User License Agreement (required to run SQL Server)
+      - ACCEPT_EULA=Y
+
+      # Password for the 'sa' (System Administrator) account
+      # Must be strong: 8+ chars with uppercase, lowercase, and numbers
+      # THIS MATCHES THE PASSWORD IN appsettings.json!
+      - SA_PASSWORD=Sa123456
+
+      # SQL Server edition: Developer = free with all features (dev only, not production)
+      # Other options: Express (free, limited), Enterprise, Standard
+      - MSSQL_PID=Developer
+
+    # Port mapping: exposes container ports to your host machine (Mac)
+    # Format: "host-port:container-port"
+    # Port 1433 is the default SQL Server port
+    # Allows your .NET backend to connect to SQL Server
+    ports:
+      - "1433:1433"
+
+    # Volume mapping: persists data even when container stops/is deleted
+    # sqlserver-data = named volume (defined below)
+    # /var/opt/mssql = where SQL Server stores database files inside container
+    # Ensures Bookify database data is NOT lost on restart
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+    # Restart policy: auto-restart if container crashes
+    # unless-stopped = restart automatically UNLESS you explicitly stopped it
+    restart: unless-stopped
+
+    # Health check: Docker periodically tests if SQL Server is healthy
+    healthcheck:
+      # Command to test: runs sqlcmd to execute "SELECT 1" query
+      # -S localhost = connect to SQL Server on localhost
+      # -U sa = use the 'sa' user
+      # -P Sa123456 = use this password
+      # -C = trust the server certificate
+      # -Q "SELECT 1" = quick test query
+      # || exit 1 = if command fails, exit with error code
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Sa123456 -C -Q "SELECT 1" || exit 1
+
+      # Run health check every 10 seconds
+      interval: 10s
+
+      # Health check must complete within 3 seconds or it's considered failed
+      timeout: 3s
+
+      # Container must fail health check 10 times in a row to be marked unhealthy
+      retries: 10
+
+      # Grace period when container first starts (10 seconds)
+      # Health check failures during this time don't count toward retry limit
+      # Gives SQL Server time to fully initialize
+      start_period: 10s
+
+# Top-level volumes section: defines named volumes that can be used by services
+volumes:
+  # Declares the sqlserver-data volume referenced above
+  # Docker creates and manages this volume
+  # Data persists even if container is deleted
+  sqlserver-data:

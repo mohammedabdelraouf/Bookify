@@ -15,7 +15,11 @@ namespace backend.RepositoryPattern.Repositories
         {
             return await _context.Rooms.
                  Include(R => R.RoomType) //eager loading to avoid null values for RoomType properties
+<<<<<<< HEAD:backend/RepositoryPattern/Repositories/RoomRepository.cs
                  .Include(r => r.RoomImages) // eager loading to include room images
+=======
+                 .Include(R => R.RoomImages) //eager loading to include room images
+>>>>>>> complete-booking-system:backend/Repositories/RoomRepository.cs
                  .Select(r => new RoomDto { // converting the entity to dto so the front end can handle them
                      roomId = r.RoomId,
                      roomNumber = r.RoomNumber,
@@ -25,7 +29,11 @@ namespace backend.RepositoryPattern.Repositories
                      roomTypeDescription = r.RoomType.Description,
                      roomTypeCapacity = r.RoomType.Capacity,
                      roomTypePricePerNight = r.RoomType.PricePerNight,
+<<<<<<< HEAD:backend/RepositoryPattern/Repositories/RoomRepository.cs
                      Images = r.RoomImages!.Select(img => new RoomImageDto
+=======
+                     Images = r.RoomImages.Select(img => new RoomImageDto
+>>>>>>> complete-booking-system:backend/Repositories/RoomRepository.cs
                      {
                          ImageId = img.ImageId,
                          Url = img.ImageUrl,
